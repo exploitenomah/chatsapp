@@ -13,5 +13,10 @@
     "morgan": "~1.9.1",
     "pug": "2.0.0-beta11",
     "socket.io": "^4.6.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.20",
+    "prettier": "^2.8.4",
+    "prettier-plugin-solidity": "^1.1.2"
   }
 }
