@@ -1,6 +1,7 @@
 const mongoose = require('mongoose')
 const imageSchema = require('./imageSchema')
 const { emailRegex } = require('../utils/constants')
+const { bcryptEncrypt } = require('../utils/security')
 
 const userSchema = new mongoose.Schema({
   profileImg: imageSchema,
@@ -35,6 +36,17 @@ const userSchema = new mongoose.Schema({
     type: String,
   },
   emailConfirmationExpiry: Date,
+})
+
+userSchema.methods.hashKeys = async function (...keys) {
+  for (const key of keys) {
+    this[key] = await bcryptEncrypt(this[key])
+  }
+}
+userSchema.pre('save', async function (next) {
+  if (!this.isModified('password')) return next()
+  await this.hashKeys('password')
+  next()
 })
 
 module.exports.User = mongoose.model('User', userSchema)
