@@ -3,9 +3,9 @@
 const app = require('./app')
 const debug = require('debug')('backend:server')
 const http = require('http')
-const startSocketServer = require('./socket_server')
-const { ioListening, namespaceListening } = require('./socket_server')
-const { namespaces } = require('./namespaces')
+const startSocketServer = require('./socket/socket_server')
+const { ioListening, namespaceListening } = require('./socket/socket_server')
+const { namespaces } = require('./socket/namespaces')
 
 const port = normalizePort(process.env.PORT || '3000')
 app.set('port', port)
