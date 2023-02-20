@@ -25,14 +25,14 @@ const onConnect = (socket, connections = new Set()) => {
   return connections
 }
 
-module.exports.ioListening = (io) => {
+module.exports.ioListening = (io, events) => {
   let connections = new Set()
   return io.on('connection', (socket) => {
     connections = onConnect(socket, connections)
     socket.on('disconnect', () => {
       connections.delete(socket)
     })
-    socketListening(io, socket)
+    socketListening(io, socket, events)
   })
 }
 
