@@ -6,6 +6,8 @@ const http = require('http')
 const startSocketServer = require('./socket/socket_server')
 const { ioListening, namespaceListening } = require('./socket/socket_server')
 const { namespaces } = require('./socket/namespaces')
+const { authenticate } = require('./socket/middleware/auth')
+const { ioUserEvents } = require('./socket/namespaces/users')
 
 const port = normalizePort(process.env.PORT || '3000')
 app.set('port', port)
@@ -16,7 +18,9 @@ server.on('error', onError)
 server.on('listening', onListening)
 
 const io = startSocketServer(server)
-ioListening(io)
+ioListening(io, { ...ioUserEvents })
+
+namespaces.map((namespace) => io.of(namespace).use(authenticate))
 namespaces.map((namespace) => namespaceListening(io, namespace))
 
 function normalizePort(val) {
