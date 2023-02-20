@@ -1,3 +1,6 @@
+const { createUser } = require('../../controllers/user')
+const { socketTryCatcher } = require('../../utils/tryCatcher')
+
 const events = {
   get: 'users:get',
   update: 'users:update',
@@ -16,12 +19,13 @@ module.exports.userEventHandlers = {
   },
 }
 
-const login = (io, socket, data) => {
+const login = async (io, socket, data) => {
   socket.emit('login', 'login')
 }
 
-const signup = (io, socket, data) => {
-  socket.emit('signup', 'signup')
-}
+const signup = socketTryCatcher(async (io, socket, data) => {
+  const newUser = await createUser(data)
+  socket.emit('signup', newUser)
+})
 
 module.exports.ioUserEvents = { login, signup }
