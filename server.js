@@ -3,25 +3,42 @@
 const app = require('./app')
 const debug = require('debug')('backend:server')
 const http = require('http')
+const mongoose = require('mongoose')
 const startSocketServer = require('./socket/socket_server')
 const { ioListening, namespaceListening } = require('./socket/socket_server')
 const { namespaces } = require('./socket/namespaces')
 const { authenticate } = require('./socket/middleware/auth')
 const { ioUserEvents } = require('./socket/namespaces/users')
 
-const port = normalizePort(process.env.PORT || '3000')
-app.set('port', port)
-
 const server = http.createServer(app)
-server.listen(port)
-server.on('error', onError)
-server.on('listening', onListening)
+const port = normalizePort(process.env.PORT || '3000')
 
-const io = startSocketServer(server)
-ioListening(io, { ...ioUserEvents })
+mongoose.set('strictQuery', false)
+mongoose
+  .connect(
+    process.env.CONNECTION_STRING.replace(
+      '<password>',
+      process.env.DB_PASSWORD,
+    ),
+  )
+  .then(() => {
+    console.log('DB connected successfully!')
+    app.set('port', port)
 
-namespaces.map((namespace) => io.of(namespace).use(authenticate))
-namespaces.map((namespace) => namespaceListening(io, namespace))
+    server.listen(port)
+    server.on('error', onError)
+    server.on('listening', () => {
+      onListening()
+      console.log('Listening on port: ', port)
+    })
+
+    const io = startSocketServer(server)
+    ioListening(io, { ...ioUserEvents })
+
+    namespaces.map((namespace) => io.of(namespace).use(authenticate))
+    namespaces.map((namespace) => namespaceListening(io, namespace))
+  })
+  .catch((err) => console.error(err))
 
 function normalizePort(val) {
   const port = parseInt(val, 10)
@@ -61,3 +78,8 @@ function onListening() {
   const bind = typeof addr === 'string' ? 'pipe ' + addr : 'port ' + addr.port
   debug('Listening on ' + bind)
 }
+
+process.on('unhandledRejection', () => {
+  console.log('An Error Occurred!!!')
+  process.exit()
+})
