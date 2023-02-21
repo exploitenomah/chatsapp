@@ -1,7 +1,7 @@
 const mongoose = require('mongoose')
 const imageSchema = require('./imageSchema')
 const { emailRegex } = require('../utils/constants')
-const { bcryptEncrypt } = require('../utils/security')
+const { bcryptEncrypt, bcryptCompare } = require('../utils/security')
 
 const userSchema = new mongoose.Schema({
   profileImg: imageSchema,
@@ -16,6 +16,13 @@ const userSchema = new mongoose.Schema({
     required: true,
     minLength: [2, 'Last name is too short. Minimum is 2 characters'],
     maxLength: [50, 'Last name is too long!'],
+  },
+  nickName: {
+    type: String,
+    required: true,
+    minLength: [2, 'Nickname is too short. Minimum is 2 characters'],
+    maxLength: [50, 'Nickname is too long!'],
+    unique: true,
   },
   email: {
     type: String,
@@ -37,7 +44,13 @@ const userSchema = new mongoose.Schema({
   },
   emailConfirmationExpiry: Date,
 })
-
+userSchema.methods.verifyPassword = async function (plainPassword) {
+  const isCorrectPassword = await bcryptCompare({
+    plain: plainPassword,
+    hashed: this.password,
+  })
+  return isCorrectPassword
+}
 userSchema.methods.hashKeys = async function (...keys) {
   for (const key of keys) {
     this[key] = await bcryptEncrypt(this[key])
