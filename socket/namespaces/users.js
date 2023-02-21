@@ -1,4 +1,4 @@
-const { createUser } = require('../../controllers/user')
+const { createUser, loginUser } = require('../../controllers/user')
 const { socketTryCatcher } = require('../../utils/tryCatcher')
 
 const events = {
@@ -19,9 +19,11 @@ module.exports.userEventHandlers = {
   },
 }
 
-const login = async (io, socket, data) => {
-  socket.emit('login', 'login')
-}
+const login = socketTryCatcher(async (io, socket, data) => {
+  const userData = await loginUser(data)
+  if (userData) socket.emit('login', userData)
+  else socket.emit('error', 'Invalid credentials')
+})
 
 const signup = socketTryCatcher(async (io, socket, data) => {
   const newUser = await createUser(data)
