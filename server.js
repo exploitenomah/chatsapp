@@ -13,6 +13,25 @@ const { ioUserEvents } = require('./socket/namespaces/users')
 const server = http.createServer(app)
 const port = normalizePort(process.env.PORT || '3000')
 
+function startSocket() {
+  const io = startSocketServer(server)
+  ioListening(io, { ...ioUserEvents })
+
+  namespaces.map((namespace) => io.of(namespace).use(authenticate))
+  namespaces.map((namespace) => namespaceListening(io, namespace))
+  console.log('socket listening...')
+}
+function startServer() {
+  app.set('port', port)
+
+  server.listen(port)
+  server.on('error', onError)
+  server.on('listening', () => {
+    onListening()
+    console.log('Listening on port: ', port)
+  })
+}
+
 mongoose.set('strictQuery', false)
 mongoose
   .connect(
@@ -23,20 +42,8 @@ mongoose
   )
   .then(() => {
     console.log('DB connected successfully!')
-    app.set('port', port)
-
-    server.listen(port)
-    server.on('error', onError)
-    server.on('listening', () => {
-      onListening()
-      console.log('Listening on port: ', port)
-    })
-
-    const io = startSocketServer(server)
-    ioListening(io, { ...ioUserEvents })
-
-    namespaces.map((namespace) => io.of(namespace).use(authenticate))
-    namespaces.map((namespace) => namespaceListening(io, namespace))
+    startServer()
+    startSocket()
   })
   .catch((err) => console.error(err))
 
@@ -69,7 +76,7 @@ function onError(error) {
       console.error(bind + ' is already in use')
       process.exit(1)
     default:
-      throw error
+    // throw error
   }
 }
 
