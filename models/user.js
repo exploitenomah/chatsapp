@@ -1,5 +1,5 @@
 const mongoose = require('mongoose')
-const imageSchema = require('./imageSchema')
+const imageSchema = require('./image')
 const { emailRegex } = require('../utils/constants')
 const { bcryptEncrypt, bcryptCompare } = require('../utils/security')
 
