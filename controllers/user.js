@@ -22,3 +22,8 @@ module.exports.createUser = async (data) => {
 module.exports.getUser = async (filter, select) => {
   return await UserController.getDoc(filter, select)
 }
+module.exports.updateUser = async (filter, update) => {
+  return await UserController.updateDoc(filter, update, {
+    returnOriginal: false,
+  })
+}
