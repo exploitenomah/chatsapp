@@ -14,8 +14,8 @@ module.exports = function startSocketServer(server) {
 const socketListening = (io, socket, events = {}) => {
   const eventNames = Object.keys(events)
   eventNames.map((eventName) =>
-    socket.on(eventName, (req) => {
-      events[eventName](io, socket, req)
+    socket.on(eventName, async (req) => {
+      await events[eventName](io, socket, req)
     }),
   )
 }
