@@ -27,3 +27,9 @@ module.exports.updateUser = async (filter, update) => {
     returnOriginal: false,
   })
 }
+module.exports.deleteUser = async (filter) => {
+  return await UserController.deleteDoc(filter)
+}
+module.exports.getMany = async (searchQuery) => {
+  return await UserController.getMany(searchQuery)
+}
