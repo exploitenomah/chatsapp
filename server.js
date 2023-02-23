@@ -8,14 +8,14 @@ const startSocketServer = require('./socket/socket_server')
 const { ioListening, namespaceListening } = require('./socket/socket_server')
 const { namespaces } = require('./socket/namespaces')
 const { authenticate } = require('./socket/middleware/auth')
-const { ioUserEvents } = require('./socket/namespaces/users')
+const { ioUserEventHandlers } = require('./socket/namespaces/users')
 
 const server = http.createServer(app)
 const port = normalizePort(process.env.PORT || '3000')
 
 function startSocket() {
   const io = startSocketServer(server)
-  ioListening(io, { ...ioUserEvents })
+  ioListening(io, { ...ioUserEventHandlers })
 
   namespaces.map((namespace) => io.of(namespace).use(authenticate))
   namespaces.map((namespace) => namespaceListening(io, namespace))
