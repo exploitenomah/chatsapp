@@ -5,7 +5,7 @@ module.exports.authenticate = async (socket, next) => {
   const token = socket.handshake.auth?.token
   if (!token) return next(new Error('Unauthorized!!!'))
   const tokenPayload = verifyJWT(token)
-  const user = getUser(tokenPayload)
+  const user = await getUser({ _id: tokenPayload._id })
   if (!user) return next(new Error('Unauthorized!!!'))
   socket.user = user
   next()
