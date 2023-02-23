@@ -1,18 +1,15 @@
 const { userEventHandlers } = require('./users')
+const { conversationEventHandlers } = require('./conversations')
 
 const namespacesSrc = {
   users: '/users',
-  chatrooms: '/chatrooms',
+  conversations: '/conversations',
   messages: '/messages',
 }
 
 module.exports.namespacesEventsHandlers = {
   [namespacesSrc.users]: userEventHandlers,
-  [namespacesSrc.chatrooms]: {
-    ping: (io, socket, data) => {
-      socket.emit('pong', '/chatrooms')
-    },
-  },
+  [namespacesSrc.conversations]: conversationEventHandlers,
   [namespacesSrc.messages]: {
     ping: (io, socket, data) => {
       socket.emit('pong', '/messages')
