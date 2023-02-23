@@ -15,7 +15,7 @@ const socketListening = (io, socket, eventHandlers = {}) => {
   const eventNames = Object.keys(eventHandlers)
   eventNames.map((eventName) =>
     socket.on(eventName, async (req) => {
-      const eventHandler = events[eventName]
+      const eventHandler = eventHandlers[eventName]
       await eventHandler(io, socket, req)
     }),
   )
@@ -41,8 +41,10 @@ module.exports.namespaceListening = (io, namespace) => {
   let connections = new Set()
   io.of(namespace).on('connection', (socket) => {
     connections = onConnect(socket, connections)
+    socket.join(socket.user._id)
     socket.on('disconnect', () => {
       connections.delete(socket)
+      socket.leave(socket.user._id)
     })
     const namespaceEventHandlers = namespacesEventsHandlers[namespace]
     socketListening(io, socket, namespaceEventHandlers)
