@@ -1,5 +1,5 @@
 const { Server } = require('socket.io')
-const { namespacesEventsAndHandlers } = require('./namespaces')
+const { namespacesEventsHandlers } = require('./namespaces')
 
 module.exports = function startSocketServer(server) {
   const io = new Server(server, {
@@ -11,11 +11,12 @@ module.exports = function startSocketServer(server) {
   return io
 }
 
-const socketListening = (io, socket, events = {}) => {
-  const eventNames = Object.keys(events)
+const socketListening = (io, socket, eventHandlers = {}) => {
+  const eventNames = Object.keys(eventHandlers)
   eventNames.map((eventName) =>
     socket.on(eventName, async (req) => {
-      await events[eventName](io, socket, req)
+      const eventHandler = events[eventName]
+      await eventHandler(io, socket, req)
     }),
   )
 }
@@ -43,7 +44,7 @@ module.exports.namespaceListening = (io, namespace) => {
     socket.on('disconnect', () => {
       connections.delete(socket)
     })
-    const namespaceEvents = namespacesEventsAndHandlers[namespace]
-    socketListening(io, socket, namespaceEvents)
+    const namespaceEventHandlers = namespacesEventsHandlers[namespace]
+    socketListening(io, socket, namespaceEventHandlers)
   })
 }

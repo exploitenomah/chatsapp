@@ -6,7 +6,7 @@ const namespacesSrc = {
   messages: '/messages',
 }
 
-module.exports.namespacesEventsAndHandlers = {
+module.exports.namespacesEventsHandlers = {
   [namespacesSrc.users]: userEventHandlers,
   [namespacesSrc.chatrooms]: {
     ping: (io, socket, data) => {

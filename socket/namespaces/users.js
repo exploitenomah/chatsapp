@@ -3,26 +3,32 @@ const {
   loginUser,
   getUser,
   updateUser,
+  getMany,
 } = require('../../controllers/user')
 const { socketTryCatcher } = require('../../utils/tryCatcher')
 
 const events = {
-  get: 'users:get',
-  update: 'users:update',
-  delete: 'users:delete',
+  getOne: 'getOne',
+  getMe: 'getMe',
+  update: 'updateMe',
+  getMany: 'getMany',
 }
 
 module.exports.userEventHandlers = {
-  [events.get]: async (_io, socket, data) => {
+  [events.getOne]: async (_io, socket, data) => {
     const user = await getUser(data)
-    socket.emit(events.get, user)
+    socket.emit(events.getOne, user)
   },
-  [events.update]: (_io, socket, data) => {
-    const updUser = updateUser(socket.user, data)
+  [events.getMe]: async (_io, socket) => {
+    socket.emit(events.getMe, await socket.user)
+  },
+  [events.update]: async (_io, socket, data) => {
+    const updUser = await updateUser({ _id: socket.user._id }, data)
     socket.emit(events.update, updUser)
   },
-  [events.delete]: (_io, socket, data) => {
-    socket.emit(events.delete, 'delete')
+  [events.getMany]: async (_io, socket, data) => {
+    const users = await getMany(data)
+    socket.emit(events.getMany, users)
   },
 }
 
@@ -37,4 +43,4 @@ const signup = socketTryCatcher(async (_io, socket, data) => {
   socket.emit('signup', newUser)
 })
 
-module.exports.ioUserEvents = { login, signup }
+module.exports.ioUserEventHandlers = { login, signup }
