@@ -4,8 +4,9 @@ const { namespacesEventsHandlers } = require('./namespaces')
 module.exports = function startSocketServer(server) {
   const io = new Server(server, {
     cors: {
-      origin: 'http://localhost:3001',
-      methods: ['GET', 'POST'],
+      origin: '*',
+      methods: ['PUT', 'GET', 'POST', 'DELETE', 'OPTIONS'],
+      credentials: false,
     },
   })
   return io
