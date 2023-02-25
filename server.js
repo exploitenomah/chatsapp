@@ -1,9 +1,12 @@
 #!/usr/bin/env node
-
+const path = require('path')
+require('dotenv').config({
+  path: path.resolve(__dirname, '.env'),
+})
 const app = require('./app')
 const debug = require('debug')('backend:server')
 const http = require('http')
-const mongoose = require('mongoose')
+const connectDB = require('./db_connections')
 const startSocketServer = require('./socket/socket_server')
 const { ioListening, namespaceListening } = require('./socket/socket_server')
 const { namespaces } = require('./socket/namespaces')
@@ -32,20 +35,11 @@ function startServer() {
   })
 }
 
-mongoose.set('strictQuery', false)
-mongoose
-  .connect(
-    process.env.CONNECTION_STRING.replace(
-      '<password>',
-      process.env.DB_PASSWORD,
-    ),
-  )
-  .then(() => {
-    console.log('DB connected successfully!')
-    startServer()
-    startSocket()
-  })
-  .catch((err) => console.error(err))
+connectDB(() => {
+  console.log('DB connected successfully!', process.env.NODE_ENV)
+  startServer()
+  startSocket()
+})
 
 function normalizePort(val) {
   const port = parseInt(val, 10)
@@ -90,3 +84,5 @@ process.on('unhandledRejection', (err) => {
   console.log('An Error Occurred!!!', err)
   process.exit()
 })
+
+module.exports = server
