@@ -7,15 +7,13 @@ require('dotenv').config({
   path: path.resolve(__dirname, '.env'),
 })
 
-resetDb()
-
-describe('connection without authorization', () => {
+describe('No connection without authorization', () => {
   let msgsClient, convosClient, usersClient
 
   before(async (done) => {
-    msgsClient = io('http://localhost:3000/messages', {})
-    convosClient = io('http://localhost:3000/conversations', {})
-    usersClient = io('http://localhost:3000/users', {})
+    msgsClient = io(`${process.env.SERVER_URL}/messages`, {})
+    convosClient = io(`${process.env.SERVER_URL}/conversations`, {})
+    usersClient = io(`${process.env.SERVER_URL}/users`, {})
     done()
   })
 
@@ -24,6 +22,7 @@ describe('connection without authorization', () => {
     convosClient.close()
     usersClient.close()
   })
+
   it('Clients should not be connected without authorization.', function (done) {
     expect(msgsClient.connected).to.equal(false)
     expect(usersClient.connected).to.equal(false)
@@ -41,19 +40,25 @@ describe('Authentication and Authorization', () => {
     email: process.env.TEST_USER_EMAIL,
     password: process.env.TEST_USER_PASSWORD,
   }
+
   before((done) => {
-    client = io('http://localhost:3000/')
+    resetDb()
+    client = io(`${process.env.SERVER_URL}/`)
     done()
   })
+
   after(() => {
     client.close()
+    resetDb()
   })
+
   it('Should be connected.', function (done) {
     client.on('connect', function () {
       expect(client.connected).to.equal(true)
       done()
     })
   })
+
   it('Should Signup', function (done) {
     client.on('signup', (data) => {
       expect(data.firstName).to.equal(process.env.TEST_USER_FIRSTNAME)
