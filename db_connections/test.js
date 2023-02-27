@@ -11,7 +11,6 @@ module.exports = function (onConnectCb) {
       )}`.replace('<db>', `${process.env.DB}-TEST`),
     )
     .then(() => {
-      mongoose.connection.db.dropDatabase().then(console.log)
       typeof onConnectCb === 'function' && onConnectCb()
     })
     .catch((err) => console.error(err))
