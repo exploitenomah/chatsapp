@@ -1,0 +1,100 @@
+[
+    {
+        "firstName": "Vincent",
+        "lastName": "Tanner",
+        "nickName": "voluptate",
+        "email": "vincenttanner@daido.com",
+        "password": "dolor"
+    },
+    {
+        "firstName": "Kimberley",
+        "lastName": "Clements",
+        "nickName": "quis",
+        "email": "kimberleyclements@daido.com",
+        "password": "cupidatat"
+    },
+    {
+        "firstName": "Hatfield",
+        "lastName": "Mercado",
+        "nickName": "est",
+        "email": "hatfieldmercado@daido.com",
+        "password": "irure"
+    },
+    {
+        "firstName": "Travis",
+        "lastName": "Gardner",
+        "nickName": "ad",
+        "email": "travisgardner@daido.com",
+        "password": "aliquip"
+    },
+    {
+        "firstName": "Griffith",
+        "lastName": "Calhoun",
+        "nickName": "magna",
+        "email": "griffithcalhoun@daido.com",
+        "password": "consequat"
+    },
+    {
+        "firstName": "Melba",
+        "lastName": "Guerra",
+        "nickName": "ut",
+        "email": "melbaguerra@daido.com",
+        "password": "Lorem"
+    },
+    {
+        "firstName": "Santiago",
+        "lastName": "Hogan",
+        "nickName": "elit",
+        "email": "santiagohogan@daido.com",
+        "password": "ad"
+    },
+    {
+        "firstName": "Reyes",
+        "lastName": "Jensen",
+        "nickName": "labore",
+        "email": "reyesjensen@daido.com",
+        "password": "dolor"
+    },
+    {
+        "firstName": "Annette",
+        "lastName": "Duncan",
+        "nickName": "aliqua",
+        "email": "annetteduncan@daido.com",
+        "password": "qui"
+    },
+    {
+        "firstName": "Mosley",
+        "lastName": "Lindsey",
+        "nickName": "deserunt",
+        "email": "mosleylindsey@daido.com",
+        "password": "pariatur"
+    },
+    {
+        "firstName": "Campos",
+        "lastName": "Anthony",
+        "nickName": "ullamco",
+        "email": "camposanthony@daido.com",
+        "password": "deserunt"
+    },
+    {
+        "firstName": "Desiree",
+        "lastName": "Woods",
+        "nickName": "laborum",
+        "email": "desireewoods@daido.com",
+        "password": "minim"
+    },
+    {
+        "firstName": "Carlson",
+        "lastName": "Mathews",
+        "nickName": "duis",
+        "email": "carlsonmathews@daido.com",
+        "password": "quis"
+    },
+    {
+        "firstName": "Beth",
+        "lastName": "Barber",
+        "nickName": "excepteur",
+        "email": "bethbarber@daido.com",
+        "password": "ullamco"
+    }
+]
