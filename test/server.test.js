@@ -6,7 +6,7 @@ chai.use(chaiHttp)
 describe('server started', () => {
   it('Server should be alive', (done) => {
     chai
-      .request('http://localhost:3000')
+      .request(process.env.SERVER_URL)
       .get('/')
       .end((err, res) => {
         chai.assert(
