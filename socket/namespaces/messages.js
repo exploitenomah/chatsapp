@@ -14,7 +14,7 @@ const events = {
 }
 
 module.exports.messageEventHandlers = {
-  [events.new]: socketTryCatcher(async (_io, socket, data) => {
+  [events.new]: socketTryCatcher(async (_io, socket, data = {}) => {
     const newMsg = await createMessage({
       ...data,
       sender: socket.user._id,
@@ -24,7 +24,7 @@ module.exports.messageEventHandlers = {
       socket.to(recipient._id).emit(events.new, newMsg)
     })
   }),
-  [events.getOne]: socketTryCatcher(async (_io, socket, data) => {
+  [events.getOne]: socketTryCatcher(async (_io, socket, data = {}) => {
     const msg = await getMessage({
       ...data,
       $or: [
@@ -34,7 +34,7 @@ module.exports.messageEventHandlers = {
     })
     socket.emit(events.getOne, msg)
   }),
-  [events.update]: socketTryCatcher(async (_io, socket, data) => {
+  [events.update]: socketTryCatcher(async (_io, socket, data = {}) => {
     const { query, update } = data
     const updMsg = await updateMessage(
       {
@@ -51,7 +51,7 @@ module.exports.messageEventHandlers = {
       socket.to(recipient._id).emit(events.update, updMsg)
     })
   }),
-  [events.getMany]: socketTryCatcher(async (_io, socket, data) => {
+  [events.getMany]: socketTryCatcher(async (_io, socket, data = {}) => {
     const msgs = await getMany({
       ...data,
       or: [

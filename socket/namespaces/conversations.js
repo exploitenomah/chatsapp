@@ -14,21 +14,21 @@ const events = {
 }
 
 module.exports.conversationEventHandlers = {
-  [events.new]: socketTryCatcher(async (_io, socket, data) => {
+  [events.new]: socketTryCatcher(async (_io, socket, data = {}) => {
     const newConversation = await createConversation({
       ...data,
       creator: socket.user._id,
     })
     socket.emit(events.new, newConversation)
   }),
-  [events.getOne]: socketTryCatcher(async (_io, socket, data) => {
+  [events.getOne]: socketTryCatcher(async (_io, socket, data = {}) => {
     const conversation = await getConversation({
       ...data,
       participants: { $in: socket.user._id },
     })
     socket.emit(events.getOne, conversation)
   }),
-  [events.update]: socketTryCatcher(async (_io, socket, data) => {
+  [events.update]: socketTryCatcher(async (_io, socket, data = {}) => {
     const { query, update } = data
     const updConversation = await updateConversation(
       { ...(query || {}), participants: { $in: socket.user._id } },
