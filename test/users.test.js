@@ -77,6 +77,9 @@ describe('User', () => {
       expect(data.firstName).to.equal(userOneInDb.firstName)
       done()
     })
+    usersClientOne.on('error', function (msg) {
+      assert(false, msg)
+    })
     usersClientOne.emit('getOne', { _id: userOneInDb._id })
   })
 
@@ -84,6 +87,9 @@ describe('User', () => {
     usersClientTwo.on('getMe', function (data) {
       expect(data.firstName).to.equal(user2.firstName)
       done()
+    })
+    usersClientTwo.on('error', function (msg) {
+      assert(false, msg)
     })
     usersClientTwo.emit('getMe')
   })
@@ -95,6 +101,9 @@ describe('User', () => {
       )
       done()
     })
+    usersClientTwo.on('error', function (msg) {
+      assert(false, msg)
+    })
     usersClientTwo.emit('updateMe', update)
   })
   it('Should get many users', function (done) {
@@ -105,6 +114,9 @@ describe('User', () => {
       )
       expect(Array.isArray(data)).to.equal(true)
       done()
+    })
+    usersClientTwo.on('error', function (msg) {
+      assert(false, msg)
     })
     usersClientTwo.emit('getMany', {})
   })
