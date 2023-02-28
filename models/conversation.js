@@ -24,17 +24,15 @@ const conversationSchema = new mongoose.Schema(
               ),
             )),
           ].every((val) => val === true)
-
           const conversationWithParticipantsExists =
             await this.constructor.find({
               participants: val,
             })
-
           const setFromVal = new Set(val.map((el) => JSON.stringify(el)))
           return (
             setFromVal.size === val.length &&
             setFromVal.size > 1 &&
-            !conversationWithParticipantsExists &&
+            conversationWithParticipantsExists.length === 0 &&
             allAreValidUsers
           )
         },
