@@ -128,7 +128,7 @@ describe('Conversation', () => {
     convoClientThree.emit('getOne', { creator: userOneInDb._id })
   })
 
-  it('Allows update => events.update.', function (done) {
+  it('Allows update of a conversation  => events.update.', function (done) {
     convoClientOne.on('update', function (data) {
       expect(data.creator).to.equal(userTwoInDb._id)
       done()
@@ -140,5 +140,20 @@ describe('Conversation', () => {
       query: { creator: userOneInDb._id },
       update: { creator: userTwoInDb._id },
     })
+  })
+  it('Should get many conversations', function (done) {
+    convoClientOne.on('getMany', function (data) {
+      expect(typeof data).to.equal(
+        'object',
+        `Expected an array got ${typeof data}`,
+      )
+      expect(Array.isArray(data)).to.equal(true)
+      console.log(data, userOneInDb._id, userTwoInDb._id)
+      done()
+    })
+    convoClientOne.on('error', function (msg) {
+      assert(false, msg)
+    })
+    convoClientOne.emit('getMany', {})
   })
 })
