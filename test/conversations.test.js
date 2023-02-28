@@ -127,4 +127,18 @@ describe('Conversation', () => {
     })
     convoClientThree.emit('getOne', { creator: userOneInDb._id })
   })
+
+  it('Allows update => events.update.', function (done) {
+    convoClientOne.on('update', function (data) {
+      expect(data.creator).to.equal(userTwoInDb._id)
+      done()
+    })
+    convoClientOne.on('error', function (msg) {
+      assert(false, msg)
+    })
+    convoClientOne.emit('update', {
+      query: { creator: userOneInDb._id },
+      update: { creator: userTwoInDb._id },
+    })
+  })
 })
