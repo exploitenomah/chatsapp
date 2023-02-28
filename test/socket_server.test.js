@@ -42,7 +42,6 @@ describe('Authentication and Authorization', () => {
   }
 
   before((done) => {
-    resetDb()
     client = io(`${process.env.SERVER_URL}/`)
     done()
   })
