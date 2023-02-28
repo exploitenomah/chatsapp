@@ -68,6 +68,7 @@ describe('Authentication and Authorization', () => {
     })
     client.emit('signup', userData)
   })
+
   it('Should Login', (done) => {
     client.on('login', (data) => {
       assert(data.token !== undefined && data.token.length > 0)

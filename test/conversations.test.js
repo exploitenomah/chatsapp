@@ -105,6 +105,7 @@ describe('Conversation', () => {
       participants: [userOneInDb._id, userTwoInDb._id],
     })
   })
+
   it('Gets a conversation => events.getOne.', function (done) {
     convoClientOne.on('getOne', function (data) {
       expect(data.creator).to.equal(userOneInDb._id)
@@ -115,6 +116,7 @@ describe('Conversation', () => {
     })
     convoClientOne.emit('getOne', { creator: userOneInDb._id })
   })
+
   it('Allows access to conversation to only participants => events.getOne.', function (done) {
     convoClientThree.on('getOne', function (data) {
       expect(data).to.equal(null)

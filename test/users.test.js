@@ -93,6 +93,7 @@ describe('User', () => {
     })
     usersClientTwo.emit('getMe')
   })
+
   it('Should update user info => events.update', function (done) {
     const update = { firstName: 'Melhem' }
     usersClientTwo.on('updateMe', function (data) {
@@ -106,6 +107,7 @@ describe('User', () => {
     })
     usersClientTwo.emit('updateMe', update)
   })
+
   it('Should get many users', function (done) {
     usersClientTwo.on('getMany', function (data) {
       expect(typeof data).to.equal(
