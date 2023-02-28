@@ -10,15 +10,19 @@ require('dotenv').config({
 
 const user1 = testUsers[0]
 const user2 = testUsers[1]
+const user3 = testUsers[2]
 
 describe('Conversation', () => {
   let defaultClient,
     clientOneToken,
     clientTwoToken,
+    clientThreeToken,
     convoClientOne,
     convoClientTwo,
+    convoClientThree,
     userOneInDb,
-    userTwoInDb
+    userTwoInDb,
+    userThreeInDb
 
   before((done) => {
     defaultClient = io(process.env.SERVER_URL)
@@ -29,17 +33,20 @@ describe('Conversation', () => {
     defaultClient.on('signup', (data) => {
       if (data.firstName === user1.firstName) userOneInDb = data
       if (data.firstName === user2.firstName) userTwoInDb = data
-      if (userOneInDb && userTwoInDb) done()
+      if (data.firstName === user3.firstName) userThreeInDb = data
+      if (userOneInDb && userTwoInDb && userThreeInDb) done()
     })
     defaultClient.emit('signup', user2)
     defaultClient.emit('signup', user1)
+    defaultClient.emit('signup', user3)
   })
 
   before((done) => {
     defaultClient.on('login', (data) => {
       if (data.user.firstName === user1.firstName) clientOneToken = data.token
       if (data.user.firstName === user2.firstName) clientTwoToken = data.token
-      if (clientOneToken && clientTwoToken) done()
+      if (data.user.firstName === user3.firstName) clientThreeToken = data.token
+      if (clientOneToken && clientTwoToken && clientThreeToken) done()
     })
     defaultClient.emit('login', {
       email: testUsers[0].email,
@@ -48,6 +55,10 @@ describe('Conversation', () => {
     defaultClient.emit('login', {
       email: testUsers[1].email,
       password: testUsers[1].password,
+    })
+    defaultClient.emit('login', {
+      email: testUsers[2].email,
+      password: testUsers[2].password,
     })
   })
   before((done) => {
@@ -61,7 +72,14 @@ describe('Conversation', () => {
       auth: { token: clientTwoToken },
     })
     convoClientTwo.on('connect', () => {
-      console.log('doe')
+      done()
+    })
+  })
+  before((done) => {
+    convoClientThree = io(`${process.env.SERVER_URL}/conversations`, {
+      auth: { token: clientThreeToken },
+    })
+    convoClientThree.on('connect', () => {
       done()
     })
   })
@@ -69,12 +87,15 @@ describe('Conversation', () => {
     defaultClient.close()
     convoClientOne.close()
     convoClientTwo.close()
+    convoClientThree.close()
     resetDb()
   })
 
   it('Create a new conversation => events.new.', function (done) {
     convoClientOne.on('new', function (data) {
       expect(data.creator).to.equal(userOneInDb._id)
+      expect(data.participants).to.include(userOneInDb._id)
+      expect(data.participants).to.include(userTwoInDb._id)
       done()
     })
     convoClientOne.on('error', function (msg) {
@@ -83,5 +104,25 @@ describe('Conversation', () => {
     convoClientOne.emit('new', {
       participants: [userOneInDb._id, userTwoInDb._id],
     })
+  })
+  it('Gets a conversation => events.getOne.', function (done) {
+    convoClientOne.on('getOne', function (data) {
+      expect(data.creator).to.equal(userOneInDb._id)
+      done()
+    })
+    convoClientOne.on('error', function (msg) {
+      assert(false, msg)
+    })
+    convoClientOne.emit('getOne', { creator: userOneInDb._id })
+  })
+  it('Allows access to conversation to only participants => events.getOne.', function (done) {
+    convoClientThree.on('getOne', function (data) {
+      expect(data).to.equal(null)
+      done()
+    })
+    convoClientThree.on('error', function (msg) {
+      assert(false, msg)
+    })
+    convoClientThree.emit('getOne', { creator: userOneInDb._id })
   })
 })
