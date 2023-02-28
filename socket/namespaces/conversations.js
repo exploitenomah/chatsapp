@@ -36,10 +36,12 @@ module.exports.conversationEventHandlers = {
     )
     socket.emit(events.update, updConversation)
   }),
-  [events.getMany]: socketTryCatcher(async (_io, socket, data) => {
+  [events.getMany]: socketTryCatcher(async (_io, socket, data = {}) => {
     const conversations = await getMany({
       ...data,
-      participants: { $in: socket.user._id },
+      ...(data.participants
+        ? { participants: [socket.user._id, ...(data.participants || [])] }
+        : { participants: { $in: socket.user._id } }),
     })
     socket.emit(events.getMany, conversations)
   }),
