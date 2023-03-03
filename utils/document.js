@@ -37,7 +37,6 @@ class DocumentController {
       /\b(gte|gt|lte|lt|ne|eq|nin|and|not|nor|or|eq)\b/g,
       (match) => `$${match}`,
     )
-    console.log(stringifiedQueryObj, query)
     query = this.Model.find(JSON.parse(stringifiedQueryObj))
 
     //** SORT **//
