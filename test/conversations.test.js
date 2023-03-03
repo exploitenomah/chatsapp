@@ -148,7 +148,6 @@ describe('Conversation', () => {
         `Expected an array got ${typeof data}`,
       )
       expect(Array.isArray(data)).to.equal(true)
-      console.log(data, userOneInDb._id, userTwoInDb._id)
       done()
     })
     convoClientOne.on('error', function (msg) {
