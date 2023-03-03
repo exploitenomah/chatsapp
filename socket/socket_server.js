@@ -42,7 +42,7 @@ module.exports.namespaceListening = (io, namespace) => {
   let connections = new Set()
   io.of(namespace).on('connection', (socket) => {
     connections = onConnect(socket, connections)
-    socket.join(socket.user._id)
+    socket.join(socket.user._id.toString())
     socket.on('disconnect', () => {
       connections.delete(socket)
       socket.leave(socket.user._id)
