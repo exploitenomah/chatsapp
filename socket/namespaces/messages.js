@@ -21,7 +21,7 @@ module.exports.messageEventHandlers = {
     })
     socket.emit(events.new, newMsg)
     newMsg.recipients.forEach((recipient) => {
-      socket.to(recipient._id).emit(events.new, newMsg)
+      socket.to(recipient.toString()).emit(events.new, newMsg)
     })
   }),
   [events.getOne]: socketTryCatcher(async (_io, socket, data = {}) => {
@@ -48,7 +48,7 @@ module.exports.messageEventHandlers = {
     )
     socket.emit(events.update, updMsg)
     updMsg.recipients.forEach((recipient) => {
-      socket.to(recipient._id).emit(events.update, updMsg)
+      socket.to(recipient.toString()).emit(events.update, updMsg)
     })
   }),
   [events.getMany]: socketTryCatcher(async (_io, socket, data = {}) => {
