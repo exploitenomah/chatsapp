@@ -20,9 +20,12 @@ app.use(express.urlencoded({ extended: false }))
 app.use(cookieParser())
 app.use(express.static(path.join(__dirname, 'public')))
 
-app.use('/', indexRouter)
-app.use('/users', usersRouter)
-app.use('/db', dbManager)
+const versionRouter = express.Router()
+versionRouter.use('/', indexRouter)
+versionRouter.use('/users', usersRouter)
+versionRouter.use('/db', dbManager)
+
+app.use('/api/v1', versionRouter)
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
