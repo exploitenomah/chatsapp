@@ -6,8 +6,8 @@ chai.use(chaiHttp)
 describe('server started', () => {
   it('Server should be alive', (done) => {
     chai
-      .request(process.env.SERVER_URL)
-      .get('/')
+      .request(`${process.env.SERVER_URL}`)
+      .get('/api/v1')
       .end((err, res) => {
         chai.assert(
           res.status === 200,
