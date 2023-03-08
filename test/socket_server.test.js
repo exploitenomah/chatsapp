@@ -32,7 +32,7 @@ describe('No connection without authorization', () => {
 })
 
 describe('Authentication and Authorization', () => {
-  let client, token
+  let client
   const userData = {
     firstName: process.env.TEST_USER_FIRSTNAME,
     lastName: process.env.TEST_USER_LASTNAME,
@@ -42,7 +42,7 @@ describe('Authentication and Authorization', () => {
   }
 
   before((done) => {
-    client = io(`${process.env.SERVER_URL}/`)
+    client = io(`${process.env.SERVER_URL}`)
     done()
   })
 
