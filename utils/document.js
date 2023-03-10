@@ -2,7 +2,9 @@ class DocumentController {
   constructor(Model) {
     this.Model = Model
   }
-
+  async checkIfExists(data) {
+    return await this.Model.exists({ ...data })
+  }
   async createDoc(data) {
     let newDoc = await this.Model.create(data)
     newDoc = await newDoc.save()
