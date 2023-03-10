@@ -5,6 +5,7 @@ const {
   updateUser,
   getMany,
 } = require('../../controllers/user')
+const { signJWT } = require('../../utils/security')
 const { socketTryCatcher } = require('../../utils/tryCatcher')
 
 const events = {
@@ -43,7 +44,8 @@ const login = socketTryCatcher(async (_io, socket, data = {}) => {
 
 const signup = socketTryCatcher(async (_io, socket, data = {}) => {
   const newUser = await createUser(data)
-  socket.emit('signup', newUser)
+  const token = signJWT({ key: '_id', value: newUser._id })
+  socket.emit('signup', { user: newUser, token })
 })
 
 module.exports.ioUserEventHandlers = { login, signup }
