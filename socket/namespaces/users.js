@@ -4,6 +4,7 @@ const {
   getUser,
   updateUser,
   getMany,
+  checkIfExists,
 } = require('../../controllers/user')
 const { signJWT } = require('../../utils/security')
 const { socketTryCatcher } = require('../../utils/tryCatcher')
@@ -13,6 +14,7 @@ const events = {
   getMe: 'getMe',
   update: 'updateMe',
   getMany: 'getMany',
+  nickNameTaken: 'nickNameTaken',
 }
 
 module.exports.userEventHandlers = {
@@ -33,6 +35,10 @@ module.exports.userEventHandlers = {
   [events.getMany]: socketTryCatcher(async (_io, socket, data = {}) => {
     const users = await getMany(data)
     socket.emit(events.getMany, users)
+  }),
+  [events.nickNameTaken]: socketTryCatcher(async (_io, socket, data = {}) => {
+    const isTaken = await checkIfExists({ nickName: data.nickName })
+    socket.emit(events.nickNameTaken, { isTaken: isTaken ? true : false })
   }),
 }
 
