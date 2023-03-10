@@ -5,12 +5,12 @@ const resetDb = require('./utils/reset_db')
 const testUsers = require('./assets/users.json')
 
 require('dotenv').config({
-  path: path.resolve(__dirname, '.env'),
+  path: path.resolve('.env'),
 })
 
 const user1 = testUsers[0]
 const user2 = testUsers[1]
-
+console.log(path.resolve('.env'), process.env.SERVER_URL)
 describe('User', () => {
   let defaultClient,
     clientOneToken,
@@ -81,6 +81,17 @@ describe('User', () => {
       assert(false, msg)
     })
     usersClientOne.emit('getOne', { _id: userOneInDb._id })
+  })
+
+  it('Check Nickname availability => events.nickNameTaken', function (done) {
+    usersClientOne.on('nickNameTaken', function (data) {
+      expect(data.isTaken).to.equal(true)
+      done()
+    })
+    usersClientOne.on('error', function (msg) {
+      assert(false, msg)
+    })
+    usersClientOne.emit('nickNameTaken', { nickName: userOneInDb.nickName })
   })
 
   it('Should get current user info => events.getMe', function (done) {
