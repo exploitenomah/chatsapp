@@ -16,7 +16,9 @@ module.exports.loginUser = async (data) => {
   }
   return passwordVerified
 }
-
+module.exports.checkIfExists = async (data) => {
+  return await UserController.checkIfExists({ ...data })
+}
 module.exports.createUser = async (data) => {
   return await UserController.createDoc({ ...data })
 }
