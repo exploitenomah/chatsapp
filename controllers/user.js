@@ -8,6 +8,7 @@ module.exports.loginUser = async (data) => {
   const filter = { ...data }
   delete filter.password
   const user = await module.exports.getUser(filter)
+  if (!user) return null
   const passwordVerified = await user.verifyPassword(data.password)
   if (passwordVerified) {
     user.password = undefined
