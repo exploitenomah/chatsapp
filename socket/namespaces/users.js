@@ -45,7 +45,8 @@ const login = socketTryCatcher(async (_io, socket, data = {}) => {
 const signup = socketTryCatcher(async (_io, socket, data = {}) => {
   const newUser = await createUser(data)
   const token = signJWT({ key: '_id', value: newUser._id })
-  socket.emit('signup', { user: newUser, token })
+  newUser.token = token
+  socket.emit('signup', newUser)
 })
 
 module.exports.ioUserEventHandlers = { login, signup }
