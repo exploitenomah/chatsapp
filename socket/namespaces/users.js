@@ -14,7 +14,7 @@ const events = {
   getMe: 'getMe',
   update: 'updateMe',
   getMany: 'getMany',
-  nickNameTaken: 'nickNameTaken',
+  isTaken: 'isTaken',
 }
 
 module.exports.userEventHandlers = {
@@ -36,10 +36,10 @@ module.exports.userEventHandlers = {
     const users = await getMany(data)
     socket.emit(events.getMany, users)
   }),
-  [events.nickNameTaken]: socketTryCatcher(async (_io, socket, data = {}) => {
-    const isTaken = await checkIfExists({ nickName: data.nickName })
-    socket.emit(events.nickNameTaken, { isTaken: isTaken ? true : false })
-  }),
+  // [events.isTaken]: socketTryCatcher(async (_io, socket, data = {}) => {
+  //   const isTaken = await checkIfExists({ nickName: data.nickName })
+  //   socket.emit(events.isTaken, { isTaken: isTaken ? true : false })
+  // }),
 }
 
 const login = socketTryCatcher(async (_io, socket, data = {}) => {
@@ -51,8 +51,15 @@ const login = socketTryCatcher(async (_io, socket, data = {}) => {
 const signup = socketTryCatcher(async (_io, socket, data = {}) => {
   const newUser = await createUser(data)
   const token = signJWT({ key: '_id', value: newUser._id })
-  newUser.token = token
-  socket.emit('signup', newUser)
+  socket.emit('signup', { ...newUser.toObject(), token })
 })
 
-module.exports.ioUserEventHandlers = { login, signup }
+const isTaken = socketTryCatcher(async (_io, socket, data = {}) => {
+  const isTaken = await checkIfExists({ [data.key]: data.value })
+  socket.emit(events.isTaken, {
+    isTaken: isTaken ? true : false,
+    path: data.key,
+  })
+})
+
+module.exports.ioUserEventHandlers = { login, signup, isTaken }
