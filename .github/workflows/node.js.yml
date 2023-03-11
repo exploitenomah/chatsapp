@@ -16,14 +16,14 @@ jobs:
 
     env:
       PORT: 3000
-      DB_PASSWORD: ${{DB_PASSWORD}}
-      DB_USERNAME: ${{DB_USERNAME}}
-      CONNECTION_STRING: ${{CONNECTION_STRING}}
+      DB_PASSWORD: ${{secrets.DB_PASSWORD}}
+      DB_USERNAME: ${{secrets.DB_USERNAME}}
+      CONNECTION_STRING: ${{secrets.CONNECTION_STRING}}
       NODE_ENV: test
-      DB: ${{DB}}
+      DB: ${{secrets.DB}}
       SERVER_URL: "http://localhost:3000"
       ROOT_API_VERSION_PATH: "api/v1"
-      JWT_SECRET: ${{JWT_SECRET}}
+      JWT_SECRET: ${{secrets.JWT_SECRET}}
       JWT_EXPIRES_IN: "90d"
 
     steps:
