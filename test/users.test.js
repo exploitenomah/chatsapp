@@ -83,15 +83,16 @@ describe('User', () => {
     usersClientOne.emit('getOne', { _id: userOneInDb._id })
   })
 
-  it('Check Nickname availability => events.nickNameTaken', function (done) {
-    usersClientOne.on('nickNameTaken', function (data) {
+  it('Check property availability => events.isTaken', function (done) {
+    defaultClient.on('isTaken', function (data) {
       expect(data.isTaken).to.equal(true)
+      expect(data.path).to.equal('nickName')
       done()
     })
-    usersClientOne.on('error', function (msg) {
+    defaultClient.on('error', function (msg) {
       assert(false, msg)
     })
-    usersClientOne.emit('nickNameTaken', { nickName: userOneInDb.nickName })
+    defaultClient.emit('isTaken', { value: userOneInDb.nickName, key: 'nickName' })
   })
 
   it('Should get current user info => events.getMe', function (done) {
