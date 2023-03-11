@@ -37,8 +37,13 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
-    - run: echo ${{ env.CONNECTION_STRING }}
     - run: npm ci
     - run: npm run build --if-present
-    - run: npm run test:start
-    - run: npm test
+#     - run: npm run test:start
+#     - run: npm test
+    - name: "Start Backend"
+      run: |
+        npm run test:start
+    - name: "Start Tests"
+      run: |
+        npm test
