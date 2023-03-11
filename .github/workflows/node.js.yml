@@ -1,8 +1,9 @@
 # This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
 
-name: Node.js CI
 
+
+name: "Github Actions Test"
 on:
   push:
     branches: [ "main" ]
@@ -10,23 +11,32 @@ on:
     branches: [ "main" ]
 
 jobs:
-  build:
-
+  test:
     runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        node-version: [14.x, 16.x, 18.x]
-        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+    env:
+      PORT: 3000
+      DB_PASSWORD: ${{DB_PASSWORD}}
+      DB_USERNAME: ${{DB_USERNAME}}
+      CONNECTION_STRING: ${{CONNECTION_STRING}}
+      NODE_ENV: test
+      DB: ${{DB}}
+      SERVER_URL: "http://localhost:3000"
+      ROOT_API_VERSION_PATH: "api/v1"
+      JWT_SECRET: "L9Irlyd8J_ukxQDC7T9jUsq6EK1g8UMeEG8EyZAIGoTHYUPHh4"
+      JWT_EXPIRES_IN: "90d"
 
     steps:
-    - uses: actions/checkout@v3
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v3
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-    - run: npm install
-    - run: npm ci
-    - run: npm run build --if-present
-    - run: npm test
+      - uses: actions/checkout@v1
+      - name: "Install Node"
+        uses: actions/setup-node@v1
+        with:
+          node-version: "12.x"
+      - name: "Install deps"
+        run: npm install
+      - name: "start"
+        run: yarn test:start
+      - name: "Start backend and frontend concurrently on background and run tests"
+        run: |
+          yarn test
+
