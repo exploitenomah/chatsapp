@@ -46,4 +46,8 @@ jobs:
         npm run test:start &
     - name: "Start Tests"
       run: |
-        npm test
+        npm test &&
+    - name: Create Staging Release
+      run: curl \
+         -X GET \
+         ${{secrets.DEPLOY_HOOK}}
