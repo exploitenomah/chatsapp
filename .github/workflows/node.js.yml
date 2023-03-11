@@ -43,7 +43,7 @@ jobs:
 #     - run: npm test
     - name: "Start Backend"
       run: |
-        npm run test:start
+        npm run test:start &
     - name: "Start Tests"
       run: |
         npm test
