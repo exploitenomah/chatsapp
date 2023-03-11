@@ -23,7 +23,7 @@ jobs:
       DB: ${{DB}}
       SERVER_URL: "http://localhost:3000"
       ROOT_API_VERSION_PATH: "api/v1"
-      JWT_SECRET: "L9Irlyd8J_ukxQDC7T9jUsq6EK1g8UMeEG8EyZAIGoTHYUPHh4"
+      JWT_SECRET: ${{JWT_SECRET}}
       JWT_EXPIRES_IN: "90d"
 
     steps:
