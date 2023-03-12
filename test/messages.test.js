@@ -3,60 +3,38 @@ const path = require('path')
 const { expect, assert } = require('chai')
 const resetDb = require('./utils/reset_db')
 const testUsers = require('./assets/users.json')
+const { createUsers, getClient } = require('./utils/init')
 
 require('dotenv').config({
   path: path.resolve(__dirname, '.env'),
 })
 
-const user1 = testUsers[0]
-const user2 = testUsers[1]
-
 describe('Messages', () => {
-  let defaultClient,
-    clientOneToken,
-    clientTwoToken,
-    msgClientOne,
-    msgClientTwo,
+  let rootClient,
+    users = [],
     userOneInDb,
     userTwoInDb,
-    convoClient,
-    conversation
+    conversation,
+    msgClientOne,
+    msgClientTwo,
+    convoClient
 
   before((done) => {
-    defaultClient = io(process.env.SERVER_URL)
+    rootClient = createUsers(2)
+    rootClient.on('signup', (data) => {
+      users.push(data)
+      if (users.length === 2) done()
+    })
+  })
+
+  before((done) => {
+    userOneInDb = users[0]
+    userTwoInDb = users[1]
     done()
   })
 
   before((done) => {
-    defaultClient.on('signup', (data) => {
-      if (data.firstName === user1.firstName) userOneInDb = data
-      if (data.firstName === user2.firstName) userTwoInDb = data
-      if (userOneInDb && userTwoInDb) done()
-    })
-    defaultClient.emit('signup', user2)
-    defaultClient.emit('signup', user1)
-  })
-
-  before((done) => {
-    defaultClient.on('login', (data) => {
-      if (data.user.firstName === user1.firstName) clientOneToken = data.token
-      if (data.user.firstName === user2.firstName) clientTwoToken = data.token
-      if (clientOneToken && clientTwoToken) done()
-    })
-    defaultClient.emit('login', {
-      email: testUsers[0].email,
-      password: testUsers[0].password,
-    })
-    defaultClient.emit('login', {
-      email: testUsers[1].email,
-      password: testUsers[1].password,
-    })
-  })
-
-  before((done) => {
-    convoClient = io(`${process.env.SERVER_URL}/conversations`, {
-      auth: { token: clientOneToken },
-    })
+    convoClient = getClient('conversations', userOneInDb.token)
     convoClient.on('connect', done)
   })
 
@@ -74,23 +52,17 @@ describe('Messages', () => {
   })
 
   before((done) => {
-    msgClientOne = io(`${process.env.SERVER_URL}/messages`, {
-      auth: { token: clientOneToken },
-    })
+    msgClientOne = getClient('messages', userOneInDb.token)
     msgClientOne.on('connect', done)
   })
 
   before((done) => {
-    msgClientTwo = io(`${process.env.SERVER_URL}/messages`, {
-      auth: { token: clientTwoToken },
-    })
-    msgClientTwo.on('connect', () => {
-      done()
-    })
+    msgClientTwo = getClient('messages', userTwoInDb.token)
+    msgClientTwo.on('connect', () => done())
   })
 
   after(() => {
-    defaultClient.close()
+    rootClient.close()
     msgClientOne.close()
     msgClientTwo.close()
     convoClient.close()
