@@ -2,71 +2,46 @@ const io = require('socket.io-client')
 const path = require('path')
 const { expect, assert } = require('chai')
 const resetDb = require('./utils/reset_db')
-const testUsers = require('./assets/users.json')
+const { getClient, createUsers } = require('./utils/init')
 
 require('dotenv').config({
   path: path.resolve('.env'),
 })
 
-const user1 = testUsers[0]
-const user2 = testUsers[1]
-console.log(path.resolve('.env'), process.env.SERVER_URL)
 describe('User', () => {
-  let defaultClient,
-    clientOneToken,
-    clientTwoToken,
-    usersClientOne,
-    usersClientTwo,
+  let rootClient,
+    users = [],
     userOneInDb,
-    userTwoInDb
+    userTwoInDb,
+    usersClientOne,
+    usersClientTwo
 
   before((done) => {
-    defaultClient = io(process.env.SERVER_URL)
+    rootClient = createUsers(2)
+    rootClient.on('signup', (data) => {
+      users.push(data)
+      if (users.length === 2) done()
+    })
+  })
+
+  before((done) => {
+    userOneInDb = users[0]
+    userTwoInDb = users[1]
     done()
   })
 
   before((done) => {
-    defaultClient.on('signup', (data) => {
-      if (data.firstName === user1.firstName) userOneInDb = data
-      if (data.firstName === user2.firstName) userTwoInDb = data
-      if (userOneInDb && userTwoInDb) done()
-    })
-    defaultClient.emit('signup', user2)
-    defaultClient.emit('signup', user1)
-  })
-
-  before((done) => {
-    defaultClient.on('login', (data) => {
-      if (data.user.firstName === user1.firstName) clientOneToken = data.token
-      if (data.user.firstName === user2.firstName) clientTwoToken = data.token
-      if (clientOneToken && clientTwoToken) done()
-    })
-    defaultClient.emit('login', {
-      email: testUsers[0].email,
-      password: testUsers[0].password,
-    })
-    defaultClient.emit('login', {
-      email: testUsers[1].email,
-      password: testUsers[1].password,
-    })
-  })
-
-  before((done) => {
-    usersClientOne = io(`${process.env.SERVER_URL}/users`, {
-      auth: { token: clientOneToken },
-    })
+    usersClientOne = getClient('users', userOneInDb.token)
     usersClientOne.on('connect', done)
   })
 
   before((done) => {
-    usersClientTwo = io(`${process.env.SERVER_URL}/users`, {
-      auth: { token: clientTwoToken },
-    })
+    usersClientTwo = getClient('users', userTwoInDb.token)
     usersClientTwo.on('connect', done)
   })
 
   after(() => {
-    defaultClient.close()
+    rootClient.close()
     usersClientOne.close()
     usersClientTwo.close()
     resetDb()
@@ -84,20 +59,23 @@ describe('User', () => {
   })
 
   it('Check property availability => events.isTaken', function (done) {
-    defaultClient.on('isTaken', function (data) {
+    rootClient.on('isTaken', function (data) {
       expect(data.isTaken).to.equal(true)
       expect(data.path).to.equal('nickName')
       done()
     })
-    defaultClient.on('error', function (msg) {
+    rootClient.on('error', function (msg) {
       assert(false, msg)
     })
-    defaultClient.emit('isTaken', { value: userOneInDb.nickName, key: 'nickName' })
+    rootClient.emit('isTaken', {
+      value: userOneInDb.nickName,
+      key: 'nickName',
+    })
   })
 
   it('Should get current user info => events.getMe', function (done) {
     usersClientTwo.on('getMe', function (data) {
-      expect(data.firstName).to.equal(user2.firstName)
+      expect(data.firstName).to.equal(userTwoInDb.firstName)
       done()
     })
     usersClientTwo.on('error', function (msg) {
