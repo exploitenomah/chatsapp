@@ -1,20 +1,16 @@
-const io = require('socket.io-client')
 const path = require('path')
 const { expect, assert } = require('chai')
 const resetDb = require('./utils/reset_db')
 const testUsers = require('./assets/users.json')
+const { createUsers, getClient } = require('./utils/init')
 
 require('dotenv').config({
   path: path.resolve(__dirname, '.env'),
 })
 
-const user1 = testUsers[0]
-const user2 = testUsers[1]
-
 describe('Friends', () => {
-  let defaultClient,
-    clientOneToken,
-    clientTwoToken,
+  let rootClient,
+    users = [],
     friendClientOne,
     friendClientTwo,
     userOneInDb,
@@ -22,54 +18,31 @@ describe('Friends', () => {
     friendship
 
   before((done) => {
-    defaultClient = io(process.env.SERVER_URL)
+    rootClient = createUsers(2)
+    rootClient.on('signup', (data) => {
+      users.push(data)
+      if (users.length === 2) done()
+    })
+  })
+
+  before((done) => {
+    userOneInDb = users[0]
+    userTwoInDb = users[1]
     done()
   })
 
   before((done) => {
-    defaultClient.on('signup', (data) => {
-      if (data.firstName === user1.firstName) userOneInDb = data
-      if (data.firstName === user2.firstName) userTwoInDb = data
-      if (userOneInDb && userTwoInDb) done()
-    })
-    defaultClient.emit('signup', user2)
-    defaultClient.emit('signup', user1)
-  })
-
-  before((done) => {
-    defaultClient.on('login', (data) => {
-      if (data.user.firstName === user1.firstName) clientOneToken = data.token
-      if (data.user.firstName === user2.firstName) clientTwoToken = data.token
-      if (clientOneToken && clientTwoToken) done()
-    })
-    defaultClient.emit('login', {
-      email: testUsers[0].email,
-      password: testUsers[0].password,
-    })
-    defaultClient.emit('login', {
-      email: testUsers[1].email,
-      password: testUsers[1].password,
-    })
-  })
-
-  before((done) => {
-    friendClientOne = io(`${process.env.SERVER_URL}/friends`, {
-      auth: { token: clientOneToken },
-    })
+    friendClientOne = getClient('friends', userOneInDb.token)
     friendClientOne.on('connect', done)
   })
 
   before((done) => {
-    friendClientTwo = io(`${process.env.SERVER_URL}/friends`, {
-      auth: { token: clientTwoToken },
-    })
-    friendClientTwo.on('connect', () => {
-      done()
-    })
+    friendClientTwo = getClient('friends', userTwoInDb.token)
+    friendClientTwo.on('connect', () => done())
   })
 
   after(() => {
-    defaultClient.close()
+    rootClient.close()
     friendClientOne.close()
     friendClientTwo.close()
     resetDb()
