@@ -3,20 +3,15 @@ const path = require('path')
 const { expect, assert } = require('chai')
 const resetDb = require('./utils/reset_db')
 const testUsers = require('./assets/users.json')
+const { createUsers, getClient } = require('./utils/init')
 
 require('dotenv').config({
   path: path.resolve(__dirname, '.env'),
 })
 
-const user1 = testUsers[0]
-const user2 = testUsers[1]
-const user3 = testUsers[2]
-
 describe('Conversation', () => {
-  let defaultClient,
-    clientOneToken,
-    clientTwoToken,
-    clientThreeToken,
+  let rootClient,
+    users = [],
     convoClientOne,
     convoClientTwo,
     convoClientThree,
@@ -25,66 +20,35 @@ describe('Conversation', () => {
     userThreeInDb
 
   before((done) => {
-    defaultClient = io(process.env.SERVER_URL)
+    rootClient = createUsers(3)
+    rootClient.on('signup', (data) => {
+      users.push(data)
+      if (users.length === 3) done()
+    })
+  })
+  before((done) => {
+    userOneInDb = users[0]
+    userTwoInDb = users[1]
+    userThreeInDb = users[2]
     done()
   })
-
   before((done) => {
-    defaultClient.on('signup', (data) => {
-      if (data.firstName === user1.firstName) userOneInDb = data
-      if (data.firstName === user2.firstName) userTwoInDb = data
-      if (data.firstName === user3.firstName) userThreeInDb = data
-      if (userOneInDb && userTwoInDb && userThreeInDb) done()
-    })
-    defaultClient.emit('signup', user2)
-    defaultClient.emit('signup', user1)
-    defaultClient.emit('signup', user3)
-  })
-
-  before((done) => {
-    defaultClient.on('login', (data) => {
-      if (data.user.firstName === user1.firstName) clientOneToken = data.token
-      if (data.user.firstName === user2.firstName) clientTwoToken = data.token
-      if (data.user.firstName === user3.firstName) clientThreeToken = data.token
-      if (clientOneToken && clientTwoToken && clientThreeToken) done()
-    })
-    defaultClient.emit('login', {
-      email: testUsers[0].email,
-      password: testUsers[0].password,
-    })
-    defaultClient.emit('login', {
-      email: testUsers[1].email,
-      password: testUsers[1].password,
-    })
-    defaultClient.emit('login', {
-      email: testUsers[2].email,
-      password: testUsers[2].password,
-    })
+    done()
   })
   before((done) => {
-    convoClientOne = io(`${process.env.SERVER_URL}/conversations`, {
-      auth: { token: clientOneToken },
-    })
-    convoClientOne.on('connect', done)
+    convoClientOne = getClient('conversations', userOneInDb.token)
+    convoClientOne.on('connect', () => done())
   })
   before((done) => {
-    convoClientTwo = io(`${process.env.SERVER_URL}/conversations`, {
-      auth: { token: clientTwoToken },
-    })
-    convoClientTwo.on('connect', () => {
-      done()
-    })
+    convoClientTwo = getClient('conversations', userTwoInDb.token)
+    convoClientTwo.on('connect', () => done())
   })
   before((done) => {
-    convoClientThree = io(`${process.env.SERVER_URL}/conversations`, {
-      auth: { token: clientThreeToken },
-    })
-    convoClientThree.on('connect', () => {
-      done()
-    })
+    convoClientThree = getClient('conversations', userThreeInDb.token)
+    convoClientThree.on('connect', () => done())
   })
   after(() => {
-    defaultClient.close()
+    rootClient.close()
     convoClientOne.close()
     convoClientTwo.close()
     convoClientThree.close()
@@ -141,6 +105,7 @@ describe('Conversation', () => {
       update: { creator: userTwoInDb._id },
     })
   })
+
   it('Should get many conversations', function (done) {
     convoClientOne.on('getMany', function (data) {
       expect(typeof data).to.equal(
