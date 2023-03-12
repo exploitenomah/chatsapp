@@ -4,17 +4,22 @@ const { signJWT } = require('../utils/security')
 
 const UserController = new DocumentController(User)
 
+module.exports.attachJwtToUser = (user) => {
+  return {
+    ...user.toObject(),
+    token: signJWT({ key: '_id', val: user._id }),
+  }
+}
+
 module.exports.loginUser = async (data) => {
   const filter = { ...data }
   delete filter.password
   const user = await module.exports.getUser(filter)
   if (!user) return null
   const passwordVerified = await user.verifyPassword(data.password)
-  if (passwordVerified) {
-    user.password = undefined
-    return { user, token: signJWT({ key: '_id', val: user._id }) }
-  }
-  return passwordVerified
+  if (!passwordVerified) return null
+  user.password = undefined
+  return module.exports.attachJwtToUser(user)
 }
 module.exports.checkIfExists = async (data) => {
   return await UserController.checkIfExists({ ...data })
