@@ -56,4 +56,4 @@ jobs:
       - name: Create Staging Release
         run: curl \
           -X GET \
-          ${{env.DEPLOY_HOOK}}
+          "https://api.render.com/deploy/srv-cg68cg9mbg5ab7jpe1v0?key=J17Y5epGaGw"
