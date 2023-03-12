@@ -64,6 +64,7 @@ describe('Authentication and Authorization', () => {
       expect(data.lastName).to.equal(process.env.TEST_USER_LASTNAME)
       expect(data.nickName).to.equal(process.env.TEST_USER_NICKNAME)
       expect(data.email).to.equal(process.env.TEST_USER_EMAIL)
+      expect(data.token).to.not.be.undefined
       done()
     })
     client.emit('signup', userData)
@@ -72,10 +73,10 @@ describe('Authentication and Authorization', () => {
   it('Should Login', (done) => {
     client.on('login', (data) => {
       assert(data.token !== undefined && data.token.length > 0)
-      expect(data.user.firstName).to.equal(process.env.TEST_USER_FIRSTNAME)
-      expect(data.user.lastName).to.equal(process.env.TEST_USER_LASTNAME)
-      expect(data.user.nickName).to.equal(process.env.TEST_USER_NICKNAME)
-      expect(data.user.email).to.equal(process.env.TEST_USER_EMAIL)
+      expect(data.firstName).to.equal(process.env.TEST_USER_FIRSTNAME)
+      expect(data.lastName).to.equal(process.env.TEST_USER_LASTNAME)
+      expect(data.nickName).to.equal(process.env.TEST_USER_NICKNAME)
+      expect(data.email).to.equal(process.env.TEST_USER_EMAIL)
       done()
     })
     client.emit('login', {
