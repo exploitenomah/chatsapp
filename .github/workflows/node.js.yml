@@ -5,9 +5,9 @@ name: Node.js CI
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 jobs:
   build:
@@ -22,7 +22,13 @@ jobs:
       JWT_SECRET: ${{secrets.JWT_SECRET}}
       JWT_EXPIRES_IN: "90d"
       NODE_ENV: "test"
-
+      TEST_USER_FIRSTNAME: ${{ secrets.TEST_USER_FIRSTNAME }}
+      TEST_USER_LASTNAME: ${{secrets.TEST_USER_LASTNAME}}
+      TEST_USER_NICKNAME: ${{secrets.TEST_USER_NICKNAME}}
+      TEST_USER_EMAIL: ${{secrets.TEST_USER_EMAIL}}
+      TEST_USER_PASSWORD: ${{secrets.TEST_USER_PASSWORD}}
+      DEPLOY_HOOK: ${{secrets.DEPLOY_HOOK}}
+      
     runs-on: ubuntu-latest
 
     strategy:
@@ -31,25 +37,21 @@ jobs:
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
-    - uses: actions/checkout@v3
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v3
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-    - run: npm ci
-    - run: npm run build --if-present
-#     - run: npm run test:start
-#     - run: npm test
-    - name: "Start Backend"
-      run: |
-        npm run test:start &
-    - name: "Start Tests"
-      run: |
-        npm test 
-    - name: Create Staging Release
-      run: curl \
-         -X GET \
-         ${{secrets.DEPLOY_HOOK}}
-         
-
+      - uses: actions/checkout@v3
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "npm"
+      - run: npm ci
+      - run: npm run build --if-present
+      #     - run: npm run test:start
+      #     - run: npm test
+      - name: "Start Backend"
+        run: |
+          npm run test:start &
+      - name: "Start Tests"
+        run: |
+          npm test
+      - name: Create Staging Release
+        run: curl "https://api.render.com/deploy/srv-cg68cg9mbg5ab7jpe1v0?key=J17Y5epGaGw"

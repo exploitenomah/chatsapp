@@ -69,7 +69,7 @@ describe('Messages', () => {
     resetDb()
   })
 
-  it('Create a new message and emits to alll recipients => events.new.', function (done) {
+  it('Create a new message and emits to all recipients => events.new.', function (done) {
     let newMsg = {
       recipients: [userTwoInDb._id, userOneInDb._id],
       conversation_id: conversation._id,

@@ -59,6 +59,10 @@ describe('Authentication and Authorization', () => {
   })
 
   it('Should Signup', function (done) {
+    client.on('error', (err) => {
+      console.log(err)
+      assert(!err)
+    })
     client.on('signup', (data) => {
       expect(data.firstName).to.equal(process.env.TEST_USER_FIRSTNAME)
       expect(data.lastName).to.equal(process.env.TEST_USER_LASTNAME)
@@ -71,6 +75,10 @@ describe('Authentication and Authorization', () => {
   })
 
   it('Should Login', (done) => {
+    client.on('error', (err) => {
+      console.log(err)
+      assert(!err)
+    })
     client.on('login', (data) => {
       assert(data.token !== undefined && data.token.length > 0)
       expect(data.firstName).to.equal(process.env.TEST_USER_FIRSTNAME)
