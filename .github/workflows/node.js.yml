@@ -54,6 +54,4 @@ jobs:
         run: |
           npm test
       - name: Create Staging Release
-        run: curl \
-          -X GET \
-          "https://api.render.com/deploy/srv-cg68cg9mbg5ab7jpe1v0?key=J17Y5epGaGw"
+        run: curl "https://api.render.com/deploy/srv-cg68cg9mbg5ab7jpe1v0?key=J17Y5epGaGw"
