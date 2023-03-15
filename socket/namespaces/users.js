@@ -5,9 +5,11 @@ const {
   updateUser,
   getMany,
   checkIfExists,
-  attachJwtToUser,
+  // attachJwtToUser,
+  formatUserData,
+  signupUser,
 } = require('../../controllers/user')
-const { signJWT } = require('../../utils/security')
+
 const { socketTryCatcher } = require('../../utils/tryCatcher')
 
 const events = {
@@ -15,7 +17,6 @@ const events = {
   getMe: 'getMe',
   update: 'updateMe',
   getMany: 'getMany',
-  isTaken: 'isTaken',
 }
 
 module.exports.userEventHandlers = {
@@ -25,7 +26,7 @@ module.exports.userEventHandlers = {
   }),
 
   [events.getMe]: socketTryCatcher(async (_io, socket) => {
-    socket.emit(events.getMe, await socket.user)
+    socket.emit(events.getMe, await formatUserData(socket.user))
   }),
 
   [events.update]: socketTryCatcher(async (_io, socket, data = {}) => {
@@ -46,14 +47,14 @@ const login = socketTryCatcher(async (_io, socket, data = {}) => {
 })
 
 const signup = socketTryCatcher(async (_io, socket, data = {}) => {
-  const newUser = await createUser(data)
-  socket.emit('signup', { ...attachJwtToUser(newUser) })
+  const newUser = await signupUser(data)
+  socket.emit('signup', { ...(await newUser) })
 })
 
 const isTaken = socketTryCatcher(async (_io, socket, data = {}) => {
   const isTaken = await checkIfExists({ [data.key]: data.value })
-  socket.emit(events.isTaken, {
-    isTaken: isTaken ? true : false,
+  socket.emit('isTaken', {
+    isTaken: (await isTaken) ? true : false,
     path: data.key,
   })
 })
