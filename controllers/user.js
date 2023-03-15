@@ -4,11 +4,18 @@ const { signJWT } = require('../utils/security')
 
 const UserController = new DocumentController(User)
 
-module.exports.attachJwtToUser = (user) => {
+module.exports.attachJwtToUser = async (user) => {
   return {
-    ...user.toObject(),
+    ...(await user),
     token: signJWT({ key: '_id', val: user._id }),
   }
+}
+
+module.exports.formatUserData = async (user) => {
+  let friendsCount = await user.getFriendsCount(user)
+  let userToObject = await user.toObject()
+  userToObject.friendsCount = friendsCount
+  return userToObject
 }
 
 module.exports.loginUser = async (data) => {
@@ -19,7 +26,8 @@ module.exports.loginUser = async (data) => {
   const passwordVerified = await user.verifyPassword(data.password)
   if (!passwordVerified) return null
   user.password = undefined
-  return module.exports.attachJwtToUser(user)
+  const formattedUserData = module.exports.formatUserData(user)
+  return await module.exports.attachJwtToUser(formattedUserData)
 }
 module.exports.checkIfExists = async (data) => {
   return await UserController.checkIfExists({ ...data })
