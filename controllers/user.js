@@ -29,6 +29,13 @@ module.exports.loginUser = async (data) => {
   const formattedUserData = module.exports.formatUserData(user)
   return await module.exports.attachJwtToUser(formattedUserData)
 }
+
+module.exports.signupUser = async (data) => {
+  const newUser = await module.exports.createUser(data)
+  const formattedUserData = await module.exports.formatUserData(newUser)
+  return await module.exports.attachJwtToUser(formattedUserData)
+}
+
 module.exports.checkIfExists = async (data) => {
   return await UserController.checkIfExists({ ...data })
 }
