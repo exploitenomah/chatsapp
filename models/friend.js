@@ -10,7 +10,7 @@ const friendSchema = new mongoose.Schema(
         return !this.recipient.equals(val)
       },
     },
-    is_valid: {
+    isValid: {
       type: Boolean,
       default: false,
     },
