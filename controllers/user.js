@@ -19,11 +19,13 @@ module.exports.formatUserData = async (user) => {
 }
 
 module.exports.loginUser = async (data) => {
-  const filter = { ...data }
-  delete filter.password
+  const password = data.password
+  let filter = {
+    $or: [{ email: data.email }, { nickName: data.nickName }],
+  }
   const user = await module.exports.getUser(filter)
   if (!user) return null
-  const passwordVerified = await user.verifyPassword(data.password)
+  const passwordVerified = await user.verifyPassword(password)
   if (!passwordVerified) return null
   user.password = undefined
   const formattedUserData = await module.exports.formatUserData(user)
