@@ -2,6 +2,24 @@ const { User } = require('../models/user')
 const DocumentController = require('../utils/document')
 const { signJWT } = require('../utils/security')
 
+const allowedQueryPaths = [
+  'firstName',
+  'lastName',
+  'nickName',
+  'email',
+  '_id',
+  'id',
+]
+const sterilizeQuery = (query) => {
+  const sterilizedQueryObj = {}
+  allowedQueryPaths.forEach((path) => {
+    if (query[path] !== undefined) {
+      sterilizedQueryObj[path] = query[path]
+    }
+  })
+  console.log(sterilizedQueryObj)
+  return sterilizedQueryObj
+}
 const UserController = new DocumentController(User)
 
 module.exports.attachJwtToUser = (user) => {
@@ -45,11 +63,13 @@ module.exports.checkIfExists = async (data) => {
 module.exports.createUser = async (data) => {
   return await UserController.createDoc({ ...data })
 }
-module.exports.getUser = async (filter, select) => {
-  return await UserController.getDoc(filter, select)
+module.exports.getUser = async (query = {}, select) => {
+  const sterilizedQueryObj = sterilizeQuery(query)
+  return await UserController.getDoc(sterilizedQueryObj, select)
 }
-module.exports.updateUser = async (filter, update) => {
-  return await UserController.updateDoc(filter, update, {
+module.exports.updateUser = async (query = {}, update) => {
+  const sterilizedQueryObj = sterilizeQuery(query)
+  return await UserController.updateDoc(sterilizedQueryObj, update, {
     returnOriginal: false,
   })
 }
