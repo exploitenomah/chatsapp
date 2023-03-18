@@ -53,7 +53,7 @@ const userSchema = new mongoose.Schema(
     emailConfirmationToken: String,
     passwordResetToken: String,
     passwordResetExpiry: Date,
-    email_confirmation_token: {
+    emailConfirmationToken: {
       type: String,
     },
     emailConfirmationExpiry: Date,
