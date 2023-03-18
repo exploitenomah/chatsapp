@@ -6,7 +6,7 @@ module.exports = function (onConnectCb) {
     .connect(
       `${process.env.CONNECTION_STRING_LOCAL}`.replace(
         '<db>',
-        `${process.env.DB}-DEV`,
+        `${process.env.DB}-LOCAL`,
       ),
     )
     .then(() => {
