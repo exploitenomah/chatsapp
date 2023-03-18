@@ -17,7 +17,6 @@ const sterilizeQuery = (query) => {
       sterilizedQueryObj[path] = query[path]
     }
   })
-  console.log(sterilizedQueryObj)
   return sterilizedQueryObj
 }
 const UserController = new DocumentController(User)
