@@ -5,6 +5,7 @@
   "scripts": {
     "start": "NODE_ENV=prod npx node server.js",
     "dev:start": "NODE_ENV=dev npx nodemon server.js",
+    "local:start": "NODE_ENV=local npx nodemon server.js",
     "test:start": "NODE_ENV=test npx node server.js",
     "test": "echo $NODE_ENV && NODE_ENV=test npx mocha -r dotenv/config  --timeout 10000 && echo $NODE_ENV "
   },
