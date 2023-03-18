@@ -3,6 +3,8 @@ const {
   getFriend,
   updateFriend,
   getMany,
+  getFriendsSuggestions,
+  deleteFriend,
 } = require('../../controllers/friend')
 const { socketTryCatcher } = require('../../utils/tryCatcher')
 
@@ -12,6 +14,7 @@ const events = {
   remove: 'remove',
   getOne: 'getOne',
   getMany: 'getMany',
+  getSuggestions: 'getSuggestions',
 }
 
 module.exports.friendsEventHandlers = {
@@ -48,13 +51,21 @@ module.exports.friendsEventHandlers = {
       .emit(events.accept, acceptedFriendship)
   }),
   [events.remove]: socketTryCatcher(async (_io, socket, data) => {
-    const removedFriendship = await updateFriend(
-      {
-        _id: data.friendshipId,
-        $or: [{ recipient: socket.user._id }, { requester: socket.user._id }],
-      },
-      { is_valid: false },
-    )
-    socket.emit(events.remove, removedFriendship)
+    const removedFriendship = await deleteFriend({
+      _id: data.friendshipId,
+      $or: [{ recipient: socket.user._id }, { requester: socket.user._id }],
+    })
+    socket
+      .to(removedFriendship.requester.toString())
+      .to(removedFriendship.recipient.toString())
+      .emit(events.remove, removedFriendship)
+  }),
+  [events.getSuggestions]: socketTryCatcher(async (_io, socket, data) => {
+    const suggestions = await getFriendsSuggestions({
+      userId: socket.user._id,
+      page: data.page,
+      limit: data.limit,
+    })
+    socket.emit(events.getSuggestions, suggestions)
   }),
 }
