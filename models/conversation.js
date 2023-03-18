@@ -39,7 +39,7 @@ const conversationSchema = new mongoose.Schema(
         'participants must be unique and greater than 1',
       ],
     },
-    latest_msg: {
+    latestMsg: {
       type: mongoose.Schema.ObjectId,
       ref: 'Message',
     },
