@@ -23,7 +23,7 @@ const socketListening = (io, socket, eventHandlers = {}) => {
 }
 
 const onConnect = (socket, connections = new Set()) => {
-  connections.add(socket)
+  connections.add(socket.toString())
   return connections
 }
 
@@ -32,7 +32,7 @@ module.exports.ioListening = (io, events) => {
   return io.on('connection', (socket) => {
     connections = onConnect(socket, connections)
     socket.on('disconnect', () => {
-      connections.delete(socket)
+      connections.delete(socket.toString())
     })
     socketListening(io, socket, events)
   })
@@ -44,7 +44,7 @@ module.exports.namespaceListening = (io, namespace) => {
     connections = onConnect(socket, connections)
     socket.join(socket.user._id.toString())
     socket.on('disconnect', () => {
-      connections.delete(socket)
+      connections.delete(socket.toString())
       socket.leave(socket.user._id)
     })
     const namespaceEventHandlers = namespacesEventsHandlers[namespace]
