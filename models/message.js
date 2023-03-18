@@ -54,7 +54,7 @@ const messageModel = new mongoose.Schema(
       default: '',
     },
     deletedAt: Date,
-    read: {
+    seen: {
       type: Boolean,
       default: false,
     },

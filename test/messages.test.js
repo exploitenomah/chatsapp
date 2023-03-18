@@ -106,7 +106,7 @@ describe('Messages', () => {
 
   it('Allows update of a message  => events.update.', function (done) {
     msgClientOne.on('update', function (data) {
-      expect(data.read).to.equal(true)
+      expect(data.seen).to.equal(true)
       done()
     })
     msgClientOne.on('error', function (msg) {
@@ -114,7 +114,7 @@ describe('Messages', () => {
     })
     msgClientTwo.emit('update', {
       query: {},
-      update: { read: true },
+      update: { seen: true },
     })
   })
 
