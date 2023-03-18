@@ -1,23 +1,26 @@
 const DocumentController = require('../utils/document')
 const Message = require('../models/message')
-const { sterilizeQuery } = require('../utils')
+const { sterilizeObject } = require('../utils')
 const { universalQueryPaths } = require('../utils/constants')
 
-const allowedQueryPaths = [
-  ...universalQueryPaths,
-  'conversationId',
-  'sender',
-  'recipients',
+const allowedUpdatePaths = [
   'deletedAt',
   'isDeleted',
   'deletedFor',
-  'attachments',
   'text',
   'seen',
   'delivered',
 ]
+const allowedQueryPaths = [
+  ...universalQueryPaths,
+  ...allowedUpdatePaths,
+  'conversationId',
+  'sender',
+  'recipients',
+  'attachments',
+]
 const sterilizeMessagesQuery = (query) => {
-  return sterilizeQuery(allowedQueryPaths, query)
+  return sterilizeObject(allowedQueryPaths, query)
 }
 
 const MessageController = new DocumentController(Message)
@@ -31,7 +34,7 @@ module.exports.getMessage = async (filter, select) => {
 module.exports.updateMessage = async (filter, update) => {
   return await MessageController.updateDoc(
     sterilizeMessagesQuery(filter),
-    update,
+    sterilizeObject(allowedUpdatePaths, update),
     {
       returnOriginal: false,
     },

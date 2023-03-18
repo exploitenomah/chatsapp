@@ -1,6 +1,6 @@
-module.exports.sterilizeQuery = (allowedQueryPaths = [], query = {}) => {
+module.exports.sterilizeObject = (allowedPaths = [], query = {}) => {
   const sterilizedQueryObj = {}
-  allowedQueryPaths.forEach((path) => {
+  allowedPaths.forEach((path) => {
     if (query[path] !== undefined) {
       sterilizedQueryObj[path] = query[path]
     }

@@ -1,18 +1,15 @@
 const DocumentController = require('../utils/document')
 const Friend = require('../models/friend')
 const { getMany: getManyUsers } = require('./user')
-const { sterilizeQuery } = require('../utils')
+const { sterilizeObject } = require('../utils')
 const { universalQueryPaths } = require('../utils/constants')
 
-const allowedQueryPaths = [
-  ...universalQueryPaths,
-  'requester',
-  'recipient',
-  'isValid',
-]
+const allowedUpdatePaths = ['requester', 'recipient', 'isValid']
+
+const allowedQueryPaths = [...universalQueryPaths, ...allowedUpdatePaths]
 
 const sterilizeFriendsQuery = (query) => {
-  return sterilizeQuery(allowedQueryPaths, query)
+  return sterilizeObject(allowedQueryPaths, query)
 }
 
 const FriendController = new DocumentController(Friend)
@@ -26,7 +23,7 @@ module.exports.getFriend = async (filter, select) => {
 module.exports.updateFriend = async (filter, update) => {
   return await FriendController.updateDoc(
     sterilizeFriendsQuery(filter),
-    update,
+    sterilizeObject(allowedUpdatePaths, update),
     {
       returnOriginal: false,
     },

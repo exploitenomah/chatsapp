@@ -1,18 +1,15 @@
 const { User } = require('../models/user')
 const DocumentController = require('../utils/document')
 const { signJWT } = require('../utils/security')
-const { sterilizeQuery } = require('../utils')
+const { sterilizeObject } = require('../utils')
 const { universalQueryPaths } = require('../utils/constants')
 
-const allowedQueryPaths = [
-  ...universalQueryPaths,
-  'firstName',
-  'lastName',
-  'nickName',
-  'email',
-]
+const allowedUpdatePaths = ['firstName', 'lastName', 'nickName', 'email']
+
+const allowedQueryPaths = [...universalQueryPaths, ...allowedUpdatePaths]
+
 const sterilizeUsersQuery = (query) => {
-  return sterilizeQuery(allowedQueryPaths, query)
+  return sterilizeObject(allowedQueryPaths, query)
 }
 
 const UserController = new DocumentController(User)
@@ -64,9 +61,13 @@ module.exports.getUser = async (query = {}, select) => {
 }
 module.exports.updateUser = async (query = {}, update) => {
   const sterilizedQueryObj = sterilizeUsersQuery(query)
-  return await UserController.updateDoc(sterilizedQueryObj, update, {
-    returnOriginal: false,
-  })
+  return await UserController.updateDoc(
+    sterilizedQueryObj,
+    sterilizeObject(allowedUpdatePaths, update),
+    {
+      returnOriginal: false,
+    },
+  )
 }
 module.exports.deleteUser = async (filter) => {
   return await UserController.deleteDoc(filter)

@@ -1,12 +1,13 @@
 const DocumentController = require('../utils/document')
 const Conversation = require('../models/conversation')
-const { sterilizeQuery } = require('../utils')
+const { sterilizeObject } = require('../utils')
 const { universalQueryPaths } = require('../utils/constants')
 
-const allowedQueryPaths = [...universalQueryPaths, 'creator', 'participants']
+const allowedUpdatePaths = ['creator', 'participants']
+const allowedQueryPaths = [...universalQueryPaths, ...allowedUpdatePaths]
 
 const sterilizeConversationsQuery = (query) => {
-  return sterilizeQuery(allowedQueryPaths, query)
+  return sterilizeObject(allowedQueryPaths, query)
 }
 
 const ConversationController = new DocumentController(Conversation)
@@ -23,7 +24,7 @@ module.exports.getConversation = async (filter, select) => {
 module.exports.updateConversation = async (filter, update) => {
   return await ConversationController.updateDoc(
     sterilizeConversationsQuery(filter),
-    update,
+    sterilizeObject(allowedUpdatePaths, update),
     {
       returnOriginal: false,
     },
