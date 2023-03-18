@@ -1,8 +1,9 @@
 const DocumentController = require('../utils/document')
 const Conversation = require('../models/conversation')
 const { sterilizeQuery } = require('../utils')
+const { universalQueryPaths } = require('../utils/constants')
 
-const allowedQueryPaths = ['creator', 'participants', '_id', 'id']
+const allowedQueryPaths = [...universalQueryPaths, 'creator', 'participants']
 
 const sterilizeConversationsQuery = (query) => {
   return sterilizeQuery(allowedQueryPaths, query)

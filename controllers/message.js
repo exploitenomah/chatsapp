@@ -1,19 +1,20 @@
 const DocumentController = require('../utils/document')
 const Message = require('../models/message')
 const { sterilizeQuery } = require('../utils')
+const { universalQueryPaths } = require('../utils/constants')
 
 const allowedQueryPaths = [
+  ...universalQueryPaths,
   'conversationId',
   'sender',
   'recipients',
+  'deletedAt',
   'isDeleted',
   'deletedFor',
   'attachments',
   'text',
   'seen',
   'delivered',
-  '_id',
-  'id',
 ]
 const sterilizeMessagesQuery = (query) => {
   return sterilizeQuery(allowedQueryPaths, query)

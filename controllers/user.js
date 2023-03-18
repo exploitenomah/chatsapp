@@ -2,14 +2,14 @@ const { User } = require('../models/user')
 const DocumentController = require('../utils/document')
 const { signJWT } = require('../utils/security')
 const { sterilizeQuery } = require('../utils')
+const { universalQueryPaths } = require('../utils/constants')
 
 const allowedQueryPaths = [
+  ...universalQueryPaths,
   'firstName',
   'lastName',
   'nickName',
   'email',
-  '_id',
-  'id',
 ]
 const sterilizeUsersQuery = (query) => {
   return sterilizeQuery(allowedQueryPaths, query)

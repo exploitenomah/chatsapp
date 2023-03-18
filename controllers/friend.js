@@ -2,8 +2,14 @@ const DocumentController = require('../utils/document')
 const Friend = require('../models/friend')
 const { getMany: getManyUsers } = require('./user')
 const { sterilizeQuery } = require('../utils')
+const { universalQueryPaths } = require('../utils/constants')
 
-const allowedQueryPaths = ['requester', 'recipient', 'isValid', '_id', 'id']
+const allowedQueryPaths = [
+  ...universalQueryPaths,
+  'requester',
+  'recipient',
+  'isValid',
+]
 
 const sterilizeFriendsQuery = (query) => {
   return sterilizeQuery(allowedQueryPaths, query)
