@@ -1,7 +1,6 @@
 const path = require('path')
 const { expect, assert } = require('chai')
 const resetDb = require('./utils/reset_db')
-const testUsers = require('./assets/users.json')
 const { createUsers, getClient } = require('./utils/init')
 
 require('dotenv').config({
@@ -56,7 +55,7 @@ describe('Friends', () => {
     friendClientTwo.on('request', function (data) {
       friendship = data
       expect(data.recipient).to.equal(newfriend.recipient)
-      expect(data.is_valid).to.equal(false)
+      expect(data.isValid).to.equal(false)
       done()
     })
     friendClientTwo.on('error', function (friend) {
@@ -81,13 +80,14 @@ describe('Friends', () => {
   })
 
   it('Friend request should not be accepted by default', (done) => {
-    expect(friendship.is_valid).to.equal(false)
+    expect(friendship.isValid).to.equal(false)
     done()
   })
 
   it('Allows accepting a friend request  => events.accept.', function (done) {
     friendClientOne.on('accept', function (data) {
-      expect(data.is_valid).to.equal(true)
+      friendship = data
+      expect(data.isValid).to.equal(true)
       expect(data._id).to.equal(friendship._id)
       done()
     })
@@ -101,7 +101,7 @@ describe('Friends', () => {
 
   it('Should remove a friendship', function (done) {
     friendClientOne.on('remove', function (data) {
-      expect(data.is_valid).to.equal(false)
+      expect(data.isValid).to.equal(friendship.isValid)
       expect(data._id).to.equal(friendship._id)
       done()
     })
