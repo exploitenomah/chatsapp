@@ -33,7 +33,7 @@ module.exports.loginUser = async (data) => {
   let filter = {
     $or: [{ email: data.email }, { nickName: data.nickName }],
   }
-  const user = await module.exports.getUser(filter)
+  const user = await UserController.getDoc(filter)
   if (!user) return null
   const passwordVerified = await user.verifyPassword(password)
   if (!passwordVerified) return null
