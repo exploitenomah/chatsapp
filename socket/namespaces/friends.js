@@ -21,7 +21,7 @@ module.exports.friendsEventHandlers = {
   [events.request]: socketTryCatcher(async (_io, socket, data = {}) => {
     const newFriend = await createFriend({
       ...data,
-      is_valid: false,
+      isValid: false,
       requester: socket.user._id,
     })
     socket.emit(events.request, newFriend)
@@ -43,7 +43,7 @@ module.exports.friendsEventHandlers = {
         _id: data.friendshipId,
         recipient: socket.user._id,
       },
-      { is_valid: true },
+      { isValid: true },
     )
     socket.emit(events.accept, acceptedFriendship)
     socket
@@ -55,10 +55,12 @@ module.exports.friendsEventHandlers = {
       _id: data.friendshipId,
       $or: [{ recipient: socket.user._id }, { requester: socket.user._id }],
     })
-    socket
-      .to(removedFriendship.requester.toString())
-      .to(removedFriendship.recipient.toString())
-      .emit(events.remove, removedFriendship)
+    socket.emit(events.remove, removedFriendship)
+    if (socket.user._id.toString() === removedFriendship.requester.toString()) {
+      socket.to(removedFriendship.recipient.toString())
+    } else {
+      socket.to(removedFriendship.requester.toString())
+    }
   }),
   [events.getSuggestions]: socketTryCatcher(async (_io, socket, data) => {
     const suggestions = await getFriendsSuggestions({
