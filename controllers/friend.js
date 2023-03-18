@@ -1,5 +1,6 @@
 const DocumentController = require('../utils/document')
 const Friend = require('../models/friend')
+const { getMany: getManyUsers } = require('./user')
 
 const FriendController = new DocumentController(Friend)
 
@@ -19,4 +20,14 @@ module.exports.deleteFriend = async (filter) => {
 }
 module.exports.getMany = async (searchQuery) => {
   return await FriendController.getMany(searchQuery)
+}
+
+module.exports.getFriendsSuggestions = async ({ userId, page, limit }) => {
+  const users = await getManyUsers({
+    _id: { ne: userId },
+    page,
+    limit,
+    fields: '-password',
+  })
+  return users
 }
