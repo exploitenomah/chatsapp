@@ -55,16 +55,15 @@ module.exports.friendsEventHandlers = {
       _id: data.friendshipId,
       $or: [{ recipient: socket.user._id }, { requester: socket.user._id }],
     })
+    socket
+      .to(removedFriendship.recipient.toString())
+      .to(removedFriendship.requester.toString())
+      .emit(events.remove, removedFriendship)
     socket.emit(events.remove, removedFriendship)
-    if (socket.user._id.toString() === removedFriendship.requester.toString()) {
-      socket.to(removedFriendship.recipient.toString())
-    } else {
-      socket.to(removedFriendship.requester.toString())
-    }
   }),
   [events.getSuggestions]: socketTryCatcher(async (_io, socket, data) => {
     const suggestions = await getFriendsSuggestions({
-      userId: socket.user._id,
+      userId: socket.user._id.toString(),
       page: data.page,
       limit: data.limit,
     })
