@@ -1,11 +1,9 @@
 const {
-  createUser,
   loginUser,
   getUser,
   updateUser,
   getMany,
   checkIfExists,
-  // attachJwtToUser,
   formatUserData,
   signupUser,
 } = require('../../controllers/user')
@@ -52,6 +50,8 @@ const signup = socketTryCatcher(async (_io, socket, data = {}) => {
 })
 
 const isTaken = socketTryCatcher(async (_io, socket, data = {}) => {
+  if (data.key !== 'email' && data.key !== 'nickName')
+    throw new Error('Not allowed!')
   const isTaken = await checkIfExists({ [data.key]: data.value })
   socket.emit('isTaken', {
     isTaken: (await isTaken) ? true : false,
