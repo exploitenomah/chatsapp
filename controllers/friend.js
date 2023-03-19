@@ -1,8 +1,10 @@
 const DocumentController = require('../utils/document')
 const Friend = require('../models/friend')
-const { getMany: getManyUsers } = require('./user')
+const { friendsSuggestionsAggregator } = require('../aggregations/user')
 const { sterilizeObject } = require('../utils')
 const { universalQueryPaths } = require('../utils/constants')
+
+const { User } = require('../models/user')
 
 const allowedUpdatePaths = ['requester', 'recipient', 'isValid']
 
@@ -37,11 +39,7 @@ module.exports.getMany = async (searchQuery) => {
 }
 
 module.exports.getFriendsSuggestions = async ({ userId, page, limit }) => {
-  const users = await getManyUsers({
-    _id: { ne: userId },
-    page,
-    limit,
-    fields: '-password',
-  })
-  return users
+  const aggregator = friendsSuggestionsAggregator(userId, limit, page)
+  const suggestions = await User.aggregate(aggregator)
+  return suggestions
 }
