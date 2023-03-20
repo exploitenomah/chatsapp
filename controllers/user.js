@@ -76,10 +76,8 @@ module.exports.getMany = async (searchQuery) => {
   return await UserController.getMany(searchQuery)
 }
 
-module.exports.updateUserGeoLocationInfo = async (userId) => {
-  const userGeoLocationData = await getGeoLocationInfoFromIpAddress(
-    getIpFromSocket(socket),
-  )
+module.exports.updateUserGeoLocationInfo = async (userId, ipAddress) => {
+  const userGeoLocationData = await getGeoLocationInfoFromIpAddress(ipAddress)
   const formattedUserGeoLocationData =
     await formatGeoLocationResultForUserSchema(await userGeoLocationData)
   const updatedUser = await module.exports.updateUser(

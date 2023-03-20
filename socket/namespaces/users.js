@@ -50,7 +50,10 @@ const login = socketTryCatcher(async (_io, socket, data = {}) => {
         const ipNotChanged = checkIfExists({ ip: socketIpAddress })
         if (ipNotChanged) socket.emit('login', userData)
       } else {
-        const updatedUserData = await updateUserGeoLocationInfo(userData._id)
+        const updatedUserData = await updateUserGeoLocationInfo(
+          userData._id,
+          getIpFromSocket(socket),
+        )
         socket.emit('login', updatedUserData)
       }
     } else socket.emit('error', 'Invalid credentials')
@@ -65,7 +68,7 @@ const signup = socketTryCatcher(async (_io, socket, data = {}) => {
     const socketIpAddress = getIpFromSocket(socket)
     if (socketIpAddress) {
       const userGeoLocationData = await getGeoLocationInfoFromIpAddress(
-        '105.113.11.62',
+        socketIpAddress,
       )
       console.log(userGeoLocationData, 'signup')
       if (!userGeoLocationData.error) {
