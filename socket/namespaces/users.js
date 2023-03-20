@@ -6,8 +6,11 @@ const {
   checkIfExists,
   formatUserData,
   signupUser,
+  updateUserGeoLocationInfo,
 } = require('../../controllers/user')
-
+const { getIpFromSocket } = require('../../utils/socket')
+const { formatGeoLocationResultForUserSchema } = require('../../utils/user')
+const { getGeoLocationInfoFromIpAddress } = require('../../utils')
 const { socketTryCatcher } = require('../../utils/tryCatcher')
 
 const events = {
@@ -39,14 +42,46 @@ module.exports.userEventHandlers = {
 }
 
 const login = socketTryCatcher(async (_io, socket, data = {}) => {
-  const userData = await loginUser(data)
-  if (userData) socket.emit('login', userData)
-  else socket.emit('error', 'Invalid credentials')
+  try {
+    const userData = await loginUser(data)
+    if (userData) {
+      const socketIpAddress = getIpFromSocket(socket)
+      if (socketIpAddress) {
+        const ipNotChanged = checkIfExists({ ip: socketIpAddress })
+        if (ipNotChanged) socket.emit('login', userData)
+      } else {
+        const updatedUserData = await updateUserGeoLocationInfo(userData._id)
+        socket.emit('login', updatedUserData)
+      }
+    } else socket.emit('error', 'Invalid credentials')
+  } catch (err) {
+    socket.emit('error', err.message)
+  }
 })
 
 const signup = socketTryCatcher(async (_io, socket, data = {}) => {
-  const newUser = await signupUser(data)
-  socket.emit('signup', { ...(await newUser) })
+  try {
+    let newUserData = { ...data }
+    const socketIpAddress = getIpFromSocket(socket)
+    if (socketIpAddress) {
+      const userGeoLocationData = await getGeoLocationInfoFromIpAddress(
+        '105.113.11.62',
+      )
+      console.log(userGeoLocationData, 'signup')
+      if (!userGeoLocationData.error) {
+        const formattedUserGeoLocationData =
+          formatGeoLocationResultForUserSchema(await userGeoLocationData)
+        newUserData = {
+          ...newUserData,
+          ...formattedUserGeoLocationData,
+        }
+      }
+    }
+    const newUser = await signupUser(newUserData)
+    socket.emit('signup', { ...(await newUser) })
+  } catch (err) {
+    socket.emit('error', err.message)
+  }
 })
 
 const isTaken = socketTryCatcher(async (_io, socket, data = {}) => {
