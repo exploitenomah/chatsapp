@@ -16,6 +16,8 @@ module.exports.getGeoLocationInfoFromIpAddress = async (ipAddress) => {
     const ipVersion = isIP(ipAddress)
     if (ipVersion !== 4 && ipVersion !== 6) {
       return { error: true, reason: 'invalid ip address' }
+    } else if (ipAddress.includes('::ffff:127.0.0.1')) {
+      return { error: true, reason: 'reserved ip address' }
     }
     const response = await fetch(`https://ipapi.co/${ipAddress}/json/`)
     return response.json()
