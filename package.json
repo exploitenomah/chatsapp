@@ -23,6 +23,7 @@
     "mocha": "^10.2.0",
     "mongoose": "^6.9.2",
     "morgan": "~1.9.1",
+    "node-fetch": "^2.6.9",
     "pug": "2.0.0-beta11",
     "socket.io": "^4.6.0"
   },
