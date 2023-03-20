@@ -2,6 +2,7 @@ const mongoose = require('mongoose')
 const imageSchema = require('./image')
 const { emailRegex } = require('../utils/constants')
 const { bcryptEncrypt, bcryptCompare } = require('../utils/security')
+const { isIP } = require('net')
 const Friend = require('./friend')
 
 const userSchema = new mongoose.Schema(
@@ -53,10 +54,46 @@ const userSchema = new mongoose.Schema(
     emailConfirmationToken: String,
     passwordResetToken: String,
     passwordResetExpiry: Date,
-    emailConfirmationToken: {
-      type: String,
-    },
+    emailConfirmationToken: String,
     emailConfirmationExpiry: Date,
+    ip: {
+      type: String,
+      validate: function (val) {
+        const ipVersion = isIP(val)
+        return ipVersion === 6 || ipVersion === 4
+      },
+      default: '0.0.0.0',
+    },
+    ipVersion: {
+      type: String,
+      enums: ['IPv4', 'IPv6'],
+    },
+    region: { type: String, default: '' },
+    regionCode: { type: String, default: '' },
+    city: { type: String, default: '' },
+    countryName: { type: String, default: '' },
+    location: {
+      type: {
+        type: String,
+        enum: ['Point'],
+        default: 'Point',
+      },
+      coordinates: {
+        type: [Number],
+        default: [-180, -90],
+      },
+    },
+    utcOffset: {
+      type: String,
+      validate: function (val) {
+        return /^(?:(?:[+-](?:1[0-4]|0[1-9]):[0-5][0-9])|00:00)$/.test(val)
+      },
+      default: '+00:00',
+    },
+    countryCode: {
+      type: String,
+      default: '',
+    },
   },
   {
     toJSON: {
