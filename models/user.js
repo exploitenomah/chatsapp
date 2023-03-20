@@ -86,7 +86,7 @@ const userSchema = new mongoose.Schema(
     utcOffset: {
       type: String,
       validate: function (val) {
-        return /^(?:(?:[+-](?:1[0-4]|0[1-9]):[0-5][0-9])|00:00)$/.test(val)
+        return /^(?:(?:[+-](?:1[0-4]|0[0-9]):[0-5][0-9])|00:00)$/.test(val)
       },
       default: '+00:00',
     },
