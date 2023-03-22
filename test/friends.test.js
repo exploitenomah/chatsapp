@@ -54,7 +54,7 @@ describe('Friends', () => {
     })
     friendClientTwo.on('request', function (data) {
       friendship = data
-      expect(data.recipient).to.equal(newfriend.recipient)
+      expect(data.recipient._id).to.equal(newfriend.recipient)
       expect(data.isValid).to.equal(false)
       done()
     })
@@ -66,8 +66,8 @@ describe('Friends', () => {
 
   it('Gets one friend => events.getOne.', function (done) {
     friendClientOne.on('getOne', function (data) {
-      expect(data.requester).to.equal(userOneInDb._id)
-      expect(data.recipient).to.equal(userTwoInDb._id)
+      expect(data.requester._id).to.equal(userOneInDb._id)
+      expect(data.recipient._id).to.equal(userTwoInDb._id)
       done()
     })
     friendClientOne.on('error', function (friend) {
