@@ -5,6 +5,7 @@
   "scripts": {
     "start": "NODE_ENV=prod npx node server.js",
     "dev:start": "NODE_ENV=dev npx nodemon server.js",
+    "local:start": "NODE_ENV=local npx nodemon server.js",
     "test:start": "NODE_ENV=test npx node server.js",
     "test": "echo $NODE_ENV && NODE_ENV=test npx mocha -r dotenv/config  --timeout 10000 && echo $NODE_ENV "
   },
@@ -22,6 +23,7 @@
     "mocha": "^10.2.0",
     "mongoose": "^6.9.2",
     "morgan": "~1.9.1",
+    "node-fetch": "^2.6.9",
     "pug": "2.0.0-beta11",
     "socket.io": "^4.6.0"
   },

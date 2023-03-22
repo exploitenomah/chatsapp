@@ -9,10 +9,10 @@ const messaageAttachment = new mongoose.Schema(
 
 const messageModel = new mongoose.Schema(
   {
-    conversation_id: {
+    conversationId: {
       type: mongoose.Schema.ObjectId,
       ref: 'Conversation',
-      required: [true, 'A message must have a conversation_id'],
+      required: [true, 'A message must have a conversation id'],
     },
     sender: {
       type: mongoose.Schema.ObjectId,
@@ -34,11 +34,11 @@ const messageModel = new mongoose.Schema(
         'Duplicate recipients or list too long',
       ],
     },
-    is_deleted: {
+    isDeleted: {
       type: Boolean,
       default: false,
     },
-    deleted_for: [
+    deletedFor: [
       {
         type: mongoose.Schema.ObjectId,
       },
@@ -53,8 +53,8 @@ const messageModel = new mongoose.Schema(
       type: String,
       default: '',
     },
-    deleted_at: Date,
-    read: {
+    deletedAt: Date,
+    seen: {
       type: Boolean,
       default: false,
     },
@@ -62,7 +62,7 @@ const messageModel = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
-    quoted_message: {
+    quotedMessage: {
       type: mongoose.Schema.ObjectId,
     },
   },

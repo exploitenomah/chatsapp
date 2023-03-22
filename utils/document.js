@@ -27,7 +27,7 @@ class DocumentController {
     return await this.Model.findOneAndDelete(filter)
   }
 
-  async getMany(searchQuery) {
+  async getMany(searchQuery, populate) {
     let query = null
 
     //** FIND **//
@@ -59,6 +59,7 @@ class DocumentController {
     const skip = (page - 1) * limit
     query = query.skip(skip).limit(limit)
 
+    if (populate) query.populate(populate)
     return await query
   }
 }

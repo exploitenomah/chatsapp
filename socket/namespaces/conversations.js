@@ -15,11 +15,23 @@ const events = {
 
 module.exports.conversationEventHandlers = {
   [events.new]: socketTryCatcher(async (_io, socket, data = {}) => {
-    const newConversation = await createConversation({
-      ...data,
+    const { participants = [] } = data
+    const query = {
       creator: socket.user._id,
-    })
-    socket.emit(events.new, newConversation)
+      participants: [
+        ...new Set([
+          ...participants.map((participant) => participant.toString()),
+          socket.user._id.toString(),
+        ]),
+      ],
+    }
+    const existingConversation = await getConversation(query)
+    if (existingConversation) {
+      socket.emit(events.new, existingConversation)
+    } else {
+      const newConversation = await createConversation(query)
+      socket.emit(events.new, newConversation)
+    }
   }),
   [events.getOne]: socketTryCatcher(async (_io, socket, data = {}) => {
     const conversation = await getConversation({
@@ -29,9 +41,9 @@ module.exports.conversationEventHandlers = {
     socket.emit(events.getOne, conversation)
   }),
   [events.update]: socketTryCatcher(async (_io, socket, data = {}) => {
-    const { query, update } = data
+    const { query = {}, update } = data
     const updConversation = await updateConversation(
-      { ...(query || {}), participants: { $in: socket.user._id } },
+      { ...query, participants: { $in: socket.user._id } },
       update,
     )
     socket.emit(events.update, updConversation)

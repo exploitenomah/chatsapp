@@ -3,6 +3,8 @@ const {
   getFriend,
   updateFriend,
   getMany,
+  getFriendsSuggestions,
+  deleteFriend,
 } = require('../../controllers/friend')
 const { socketTryCatcher } = require('../../utils/tryCatcher')
 
@@ -12,17 +14,25 @@ const events = {
   remove: 'remove',
   getOne: 'getOne',
   getMany: 'getMany',
+  seen: 'seen',
+  getSuggestions: 'getSuggestions',
 }
 
 module.exports.friendsEventHandlers = {
   [events.request]: socketTryCatcher(async (_io, socket, data = {}) => {
     const newFriend = await createFriend({
       ...data,
-      is_valid: false,
+      isValid: false,
       requester: socket.user._id,
     })
-    socket.emit(events.request, newFriend)
-    socket.to(newFriend.recipient.toString()).emit(events.request, newFriend)
+    if (newFriend) {
+      socket.emit(events.request, newFriend)
+      socket
+        .to(newFriend.recipient._id.toString())
+        .emit(events.request, newFriend)
+    } else {
+      socket.emit('error', 'something went wrong')
+    }
   }),
   [events.getOne]: socketTryCatcher(async (_io, socket, data = {}) => {
     const friend = await getFriend({ ...data })
@@ -40,21 +50,45 @@ module.exports.friendsEventHandlers = {
         _id: data.friendshipId,
         recipient: socket.user._id,
       },
-      { is_valid: true },
+      { isValid: true, seen: true },
     )
-    socket.emit(events.accept, acceptedFriendship)
-    socket
-      .to(acceptedFriendship.requester.toString())
-      .emit(events.accept, acceptedFriendship)
+    if (acceptedFriendship) {
+      socket.emit(events.accept, acceptedFriendship)
+      socket
+        .to(acceptedFriendship.requester._id.toString())
+        .emit(events.accept, acceptedFriendship)
+    } else {
+      socket.emit('error', 'something went wrong')
+    }
   }),
   [events.remove]: socketTryCatcher(async (_io, socket, data) => {
-    const removedFriendship = await updateFriend(
-      {
-        _id: data.friendshipId,
-        $or: [{ recipient: socket.user._id }, { requester: socket.user._id }],
-      },
-      { is_valid: false },
+    const removedFriendship = await deleteFriend({
+      _id: data.friendshipId,
+      $or: [{ recipient: socket.user._id }, { requester: socket.user._id }],
+    })
+    if (removedFriendship) {
+      socket
+        .to(removedFriendship.recipient._id.toString())
+        .to(removedFriendship.requester._id.toString())
+        .emit(events.remove, removedFriendship)
+      socket.emit(events.remove, removedFriendship)
+    } else {
+      socket.emit('error', 'something went wrong')
+    }
+  }),
+  [events.seen]: socketTryCatcher(async (_io, socket, data) => {
+    const updatedFriendship = await updateFriend(
+      { _id: data.friendshipId },
+      { seen: true },
     )
-    socket.emit(events.remove, removedFriendship)
+    socket.emit(events.seen, updatedFriendship)
+  }),
+  [events.getSuggestions]: socketTryCatcher(async (_io, socket, data) => {
+    const suggestions = await getFriendsSuggestions({
+      userId: socket.user._id.toString(),
+      page: data.page,
+      limit: data.limit,
+    })
+    socket.emit(events.getSuggestions, suggestions)
   }),
 }

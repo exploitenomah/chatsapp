@@ -1,13 +1,16 @@
 const {
-  createUser,
   loginUser,
   getUser,
   updateUser,
   getMany,
   checkIfExists,
-  attachJwtToUser,
+  formatUserData,
+  signupUser,
+  updateUserGeoLocationInfo,
 } = require('../../controllers/user')
-const { signJWT } = require('../../utils/security')
+const { getIpFromSocket } = require('../../utils/socket')
+const { formatGeoLocationResultForUserSchema } = require('../../utils/user')
+const { getGeoLocationInfoFromIpAddress } = require('../../utils')
 const { socketTryCatcher } = require('../../utils/tryCatcher')
 
 const events = {
@@ -15,7 +18,6 @@ const events = {
   getMe: 'getMe',
   update: 'updateMe',
   getMany: 'getMany',
-  isTaken: 'isTaken',
 }
 
 module.exports.userEventHandlers = {
@@ -25,7 +27,7 @@ module.exports.userEventHandlers = {
   }),
 
   [events.getMe]: socketTryCatcher(async (_io, socket) => {
-    socket.emit(events.getMe, await socket.user)
+    socket.emit(events.getMe, await formatUserData(socket.user))
   }),
 
   [events.update]: socketTryCatcher(async (_io, socket, data = {}) => {
@@ -40,20 +42,57 @@ module.exports.userEventHandlers = {
 }
 
 const login = socketTryCatcher(async (_io, socket, data = {}) => {
-  const userData = await loginUser(data)
-  if (userData) socket.emit('login', userData)
-  else socket.emit('error', 'Invalid credentials')
+  try {
+    const userData = await loginUser(data)
+    if (userData) {
+      const socketIpAddress = getIpFromSocket(socket)
+      if (socketIpAddress) {
+        const ipNotChanged = checkIfExists({ ip: socketIpAddress })
+        if (ipNotChanged) socket.emit('login', userData)
+      } else {
+        const updatedUserData = await updateUserGeoLocationInfo(
+          userData._id,
+          getIpFromSocket(socket),
+        )
+        socket.emit('login', updatedUserData)
+      }
+    } else socket.emit('error', 'Invalid credentials')
+  } catch (err) {
+    socket.emit('error', err.message)
+  }
 })
 
 const signup = socketTryCatcher(async (_io, socket, data = {}) => {
-  const newUser = await createUser(data)
-  socket.emit('signup', { ...attachJwtToUser(newUser) })
+  try {
+    let newUserData = { ...data }
+    const socketIpAddress = getIpFromSocket(socket)
+    if (socketIpAddress) {
+      const userGeoLocationData = await getGeoLocationInfoFromIpAddress(
+        socketIpAddress,
+      )
+      console.log(userGeoLocationData, 'signup')
+      if (!userGeoLocationData.error) {
+        const formattedUserGeoLocationData =
+          formatGeoLocationResultForUserSchema(await userGeoLocationData)
+        newUserData = {
+          ...newUserData,
+          ...formattedUserGeoLocationData,
+        }
+      }
+    }
+    const newUser = await signupUser(newUserData)
+    socket.emit('signup', { ...(await newUser) })
+  } catch (err) {
+    socket.emit('error', err.message)
+  }
 })
 
 const isTaken = socketTryCatcher(async (_io, socket, data = {}) => {
+  if (data.key !== 'email' && data.key !== 'nickName')
+    throw new Error('Not allowed!')
   const isTaken = await checkIfExists({ [data.key]: data.value })
-  socket.emit(events.isTaken, {
-    isTaken: isTaken ? true : false,
+  socket.emit('isTaken', {
+    isTaken: (await isTaken) ? true : false,
     path: data.key,
   })
 })

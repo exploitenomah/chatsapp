@@ -2,7 +2,6 @@ const io = require('socket.io-client')
 const path = require('path')
 const { expect, assert } = require('chai')
 const resetDb = require('./utils/reset_db')
-const testUsers = require('./assets/users.json')
 const { createUsers, getClient } = require('./utils/init')
 
 require('dotenv').config({
@@ -70,9 +69,10 @@ describe('Messages', () => {
   })
 
   it('Create a new message and emits to all recipients => events.new.', function (done) {
+    console.log()
     let newMsg = {
       recipients: [userTwoInDb._id, userOneInDb._id],
-      conversation_id: conversation._id,
+      conversationId: conversation._id,
       text: 'Hello there',
     }
     msgClientOne.on('error', function (msg) {
@@ -81,7 +81,7 @@ describe('Messages', () => {
     msgClientTwo.on('new', function (data) {
       expect(data.text).to.equal(newMsg.text)
       expect(data.recipients).to.include(userTwoInDb._id)
-      expect(data.conversation_id).to.equal(conversation._id)
+      expect(data.conversationId).to.equal(conversation._id)
       done()
     })
     msgClientTwo.on('error', function (msg) {
@@ -100,13 +100,13 @@ describe('Messages', () => {
     })
     msgClientOne.emit('getOne', {
       sender: userOneInDb._id,
-      conversation_id: conversation._id,
+      conversationId: conversation._id,
     })
   })
 
   it('Allows update of a message  => events.update.', function (done) {
     msgClientOne.on('update', function (data) {
-      expect(data.read).to.equal(true)
+      expect(data.seen).to.equal(true)
       done()
     })
     msgClientOne.on('error', function (msg) {
@@ -114,7 +114,7 @@ describe('Messages', () => {
     })
     msgClientTwo.emit('update', {
       query: {},
-      update: { read: true },
+      update: { seen: true },
     })
   })
 

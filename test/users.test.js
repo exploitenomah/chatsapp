@@ -1,4 +1,3 @@
-const io = require('socket.io-client')
 const path = require('path')
 const { expect, assert } = require('chai')
 const resetDb = require('./utils/reset_db')
