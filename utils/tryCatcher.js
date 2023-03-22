@@ -30,6 +30,7 @@ module.exports.socketTryCatcher = (asyncFunc) => {
       if (err.code === 11000) error = handleDuplicateKeyError(err)
       if (err.name === 'CastError') error = handleCastError(err)
       if (err.name === 'TypeError') error = handleTypeError(err)
+      console.log(error, err)
       socket.emit('error', error.message)
     }
   }
