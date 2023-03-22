@@ -83,13 +83,7 @@ const userSchema = new mongoose.Schema(
         default: [-180, -90],
       },
     },
-    utcOffset: {
-      type: String,
-      validate: function (val) {
-        return /^(?:(?:[+-](?:1[0-4]|0[0-9]):[0-5][0-9])|00:00)$/.test(val)
-      },
-      default: '+00:00',
-    },
+
     countryCode: {
       type: String,
       default: '',
