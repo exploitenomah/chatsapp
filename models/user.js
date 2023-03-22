@@ -3,7 +3,7 @@ const imageSchema = require('./image')
 const { emailRegex } = require('../utils/constants')
 const { bcryptEncrypt, bcryptCompare } = require('../utils/security')
 const { isIP } = require('net')
-const Friend = require('./friend')
+const { Friend } = require('./friend')
 
 const userSchema = new mongoose.Schema(
   {
