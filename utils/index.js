@@ -14,14 +14,18 @@ module.exports.sterilizeObject = (allowedPaths = [], query = {}) => {
 module.exports.getGeoLocationInfoFromIpAddress = async (ipAddress) => {
   try {
     const ipVersion = isIP(ipAddress)
+    console.log(ipAddress)
     if (ipVersion !== 4 && ipVersion !== 6) {
       return { error: true, reason: 'invalid ip address' }
-    } else if (ipAddress.includes('::ffff:127.0.0.1')) {
+    } else if (ipAddress.includes('::')) {
       return { error: true, reason: 'reserved ip address' }
     }
-    const response = await fetch(`https://ipapi.co/${ipAddress}/json/`)
+    const response = await fetch(
+      `https://ipapi.co/${ipAddress}/json/?key=${process.env.IPAPI_KEY}`,
+    )
     return response.json()
   } catch (err) {
     console.log(err, 'getGeoLocationInfoFromIpAddress')
+    throw new Error(err.message)
   }
 }
