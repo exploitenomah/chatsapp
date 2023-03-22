@@ -22,11 +22,45 @@ const friendSchema = new mongoose.Schema(
         return !this.requester.equals(val)
       },
     },
+    seen: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true,
   },
 )
 
+module.exports.userSelectOptions = '-ip -ipVersion -password'
+module.exports.userPopulateOptions = [
+  {
+    path: 'requester',
+    select: '-ip -ipVersion -password',
+  },
+  {
+    path: 'recipient',
+    select: '-ip -ipVersion -password',
+  },
+]
+
+friendSchema.pre('save', function (next) {
+  this.populate(module.exports.userPopulateOptions)
+  next()
+})
+
+friendSchema.pre('findOneAndDelete', function (next) {
+  this.populate(module.exports.userPopulateOptions)
+  next()
+})
+
+friendSchema.pre('findOneAndUpdate', function (next) {
+  this.populate(module.exports.userPopulateOptions)
+  next()
+})
+friendSchema.pre('findOne', function (next) {
+  this.populate(module.exports.userPopulateOptions)
+  next()
+})
 const Friend = new mongoose.model('Friend', friendSchema)
-module.exports = Friend
+module.exports.Friend = Friend
