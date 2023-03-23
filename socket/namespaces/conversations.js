@@ -25,9 +25,16 @@ module.exports.conversationEventHandlers = {
         ]),
       ],
     }
-    const existingConversation = await getConversation(query)
+    const existingConversation = await getConversation({ participants: query.participants })
     if (existingConversation) {
-      socket.emit(events.new, existingConversation)
+      socket
+        .to(
+          existingConversation.participants.map((participant) =>
+            participant.toString(),
+          ),
+        )
+        .emit(events.new, existingConversation)
+        socket.emit(events.new, existingConversation)
     } else {
       const newConversation = await createConversation(query)
       socket.emit(events.new, newConversation)
