@@ -39,7 +39,7 @@ const conversationSchema = new mongoose.Schema(
         'participants must be unique and greater than 1',
       ],
     },
-    latestMsg: {
+    latestMessage: {
       type: mongoose.Schema.ObjectId,
       ref: 'Message',
     },
@@ -57,7 +57,18 @@ conversationSchema.pre(/^find/, function (next) {
     path: 'participants',
     options: { _recursed: true },
     select: 'nickName profileImg',
-  }).populate({ path: 'latestMsg', options: { _recursed: true } })
+  }).populate({ path: 'latestMessage', options: { _recursed: true } })
+  next()
+})
+conversationSchema.pre('save', async function (next) {
+  await this.populate([
+    {
+      path: 'participants',
+      options: { _recursed: true },
+      select: 'nickName profileImg',
+    },
+    { path: 'latestMessage', options: { _recursed: true } },
+  ])
   next()
 })
 
