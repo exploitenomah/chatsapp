@@ -52,6 +52,7 @@ const messageModel = new mongoose.Schema(
     text: {
       type: String,
       default: '',
+      trim: true,
     },
     deletedAt: Date,
     seen: {
@@ -65,15 +66,23 @@ const messageModel = new mongoose.Schema(
     quotedMessage: {
       type: mongoose.Schema.ObjectId,
     },
+    forwarded: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true,
   },
 )
-messageModel.pre(/find./g, async function (next) {
-  this.populate({ path: 'sender', select: '-password -__v' })
-  next()
-})
+// messageModel.pre(/find./g, async function (next) {
+//   this.populate({ path: 'sender', select: '-password -__v' })
+//   next()
+// })
+// messageModel.pre('save', async function (next) {
+//   this.populate({ path: 'sender', select: '-password -__v' })
+//   next()
+// })
 // messageModel.pre('save', async function (next) {
 //   if (!this.text || this.text.length === 0) {
 //     if (this.attachments.length === 0)
