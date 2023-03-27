@@ -24,7 +24,7 @@ const sterilizeMessagesQuery = (query) => {
 }
 
 const MessageController = new DocumentController(Message)
-
+module.exports.MessageController = MessageController
 module.exports.createMessage = async (data) => {
   return await MessageController.createDoc({ ...data })
 }
@@ -45,4 +45,7 @@ module.exports.deleteMessage = async (filter) => {
 }
 module.exports.getMany = async (searchQuery) => {
   return await MessageController.getMany(searchQuery)
+}
+module.exports.updateMany = async (filter, update) => {
+  return await Message.updateMany(filter, update)
 }
