@@ -3,7 +3,7 @@ const Conversation = require('../models/conversation')
 const { sterilizeObject } = require('../utils')
 const { universalQueryPaths } = require('../utils/constants')
 
-const allowedUpdatePaths = ['creator', 'participants']
+const allowedUpdatePaths = ['creator', 'participants', 'latestMessage']
 const allowedQueryPaths = [...universalQueryPaths, ...allowedUpdatePaths]
 
 const sterilizeConversationsQuery = (query) => {
