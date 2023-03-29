@@ -17,7 +17,7 @@ module.exports.getGeoLocationInfoFromIpAddress = async (ipAddress) => {
     console.log(ipAddress)
     if (ipVersion !== 4 && ipVersion !== 6) {
       return { error: true, reason: 'invalid ip address' }
-    } else if (ipAddress.includes('127.0.0.1')) {
+    } else if (ipAddress.includes('127.0.0.1') || ipAddress.includes('::1')) {
       return { error: true, reason: 'reserved ip address' }
     }
     const response = await fetch(
@@ -26,6 +26,6 @@ module.exports.getGeoLocationInfoFromIpAddress = async (ipAddress) => {
     return response.json()
   } catch (err) {
     console.log(err, 'getGeoLocationInfoFromIpAddress')
-    throw new Error(err.message)
+    return { error: true, reason: err.message }
   }
 }
