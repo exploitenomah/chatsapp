@@ -7,7 +7,15 @@ const { Friend } = require('./friend')
 
 const userSchema = new mongoose.Schema(
   {
-    profileImg: imageSchema,
+    profileImg: {
+      type: imageSchema,
+      default: {},
+    },
+    about: {
+      type: String,
+      default: '',
+      trim: true,
+    },
     firstName: {
       type: String,
       required: true,
