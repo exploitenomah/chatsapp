@@ -92,7 +92,7 @@ describe('Messages', () => {
 
   it('Gets a message => events.getOne.', function (done) {
     msgClientOne.on('getOne', function (data) {
-      expect(data.sender._id).to.equal(userOneInDb._id)
+      expect(data.sender).to.equal(userOneInDb._id)
       done()
     })
     msgClientOne.on('error', function (msg) {

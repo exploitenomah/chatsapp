@@ -30,8 +30,9 @@ module.exports.friendsSuggestionsAggregator = (user, limit, page) => {
     },
     {
       $project: {
-        friends: { $setUnion: ['$requester', '$recipient'] },
-        friendsCount: { $size: { $setUnion: ['$requester', '$recipient'] } },
+        friends: {
+          $setUnion: ['$requester', '$recipient'],
+        },
         firstName: 1,
         lastName: 1,
         nickName: 1,
@@ -40,18 +41,42 @@ module.exports.friendsSuggestionsAggregator = (user, limit, page) => {
         regionCode: 1,
         city: 1,
         countryName: 1,
-        utcOffset: 1,
         countryCode: 1,
       },
     },
     {
-      $match: {
-        friendsCount: { $lte: 0 },
-        countryCode: { $gte: user.countryCode },
-        region: { $gte: user.region },
+      $project: {
+        firstName: 1,
+        lastName: 1,
+        nickName: 1,
+        email: 1,
+        region: 1,
+        regionCode: 1,
+        city: 1,
+        countryName: 1,
+        countryCode: 1,
+        friends: {
+          $filter: {
+            input: '$friends',
+            as: 'friend',
+            cond: {
+              $or: [
+                { $eq: ['$$friend.requester', user._id] },
+                { $eq: ['$$friend.recipient', user._id] },
+              ],
+            },
+          },
+        },
       },
     },
-    { $match: {} },
+    {
+      $match: {
+        friends: {
+          $size: 0,
+        },
+      },
+    },
+    // // { $match: {} },
     { $limit: limit },
     { $skip: (page - 1) * limit },
   ]

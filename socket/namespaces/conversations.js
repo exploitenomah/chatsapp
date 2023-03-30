@@ -4,6 +4,7 @@ const {
   updateConversation,
   getMany,
 } = require('../../controllers/conversation')
+const conversation = require('../../models/conversation')
 const { socketTryCatcher } = require('../../utils/tryCatcher')
 
 const events = {
@@ -18,15 +19,19 @@ module.exports.conversationEventHandlers = {
     const { participants = [] } = data
     const query = {
       creator: socket.user._id,
-      participants: [
-        ...new Set([
-          ...participants.map((participant) => participant.toString()),
-          socket.user._id.toString(),
-        ]),
-      ],
+      participants: [...new Set([...participants, socket.user._id.toString()])],
     }
-    const existingConversation = await getConversation(query)
+    const existingConversation = await conversation.findOne({
+      participants: { $all: query.participants },
+    })
     if (existingConversation) {
+      socket
+        .to(
+          existingConversation.participants.map((participant) =>
+            participant.toString(),
+          ),
+        )
+        .emit(events.new, existingConversation)
       socket.emit(events.new, existingConversation)
     } else {
       const newConversation = await createConversation(query)

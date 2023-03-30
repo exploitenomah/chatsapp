@@ -57,8 +57,11 @@ describe('Conversation', () => {
   it('Create a new conversation => events.new.', function (done) {
     convoClientOne.on('new', function (data) {
       expect(data.creator).to.equal(userOneInDb._id)
-      expect(data.participants).to.include(userOneInDb._id)
-      expect(data.participants).to.include(userTwoInDb._id)
+      const participantsIds = data.participants.map(
+        (participant) => participant._id,
+      )
+      expect(participantsIds).to.include(userOneInDb._id)
+      expect(participantsIds).to.include(userTwoInDb._id)
       done()
     })
     convoClientOne.on('error', function (msg) {
