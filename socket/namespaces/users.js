@@ -42,49 +42,50 @@ module.exports.userEventHandlers = {
 }
 
 const login = socketTryCatcher(async (_io, socket, data = {}) => {
-  try {
-    const userData = await loginUser(data)
-    if (userData) {
-      const socketIpAddress = getIpFromSocket(socket)
-      if (socketIpAddress) {
-        const ipNotChanged = checkIfExists({ ip: socketIpAddress })
-        if (ipNotChanged) socket.emit('login', userData)
-      } else {
-        const updatedUserData = await updateUserGeoLocationInfo(
-          userData._id,
-          getIpFromSocket(socket),
-        )
-        socket.emit('login', updatedUserData)
-      }
-    } else socket.emit('error', 'Invalid credentials')
-  } catch (err) {
-    socket.emit('error', err.message)
-  }
+  // try {
+  const userData = await loginUser(data)
+  if (userData) {
+    const socketIpAddress = getIpFromSocket(socket)
+    if (socketIpAddress) {
+      const ipNotChanged = checkIfExists({ ip: socketIpAddress })
+      if (ipNotChanged) socket.emit('login', userData)
+    } else {
+      const updatedUserData = await updateUserGeoLocationInfo(
+        userData._id,
+        getIpFromSocket(socket),
+      )
+      socket.emit('login', updatedUserData)
+    }
+  } else socket.emit('error', 'Invalid credentials')
+  // } catch (err) {
+  //   socket.emit('error', err.message)
+  // }
 })
 
 const signup = socketTryCatcher(async (_io, socket, data = {}) => {
-  try {
-    let newUserData = { ...data }
-    const socketIpAddress = getIpFromSocket(socket)
-    if (socketIpAddress) {
-      const userGeoLocationData = await getGeoLocationInfoFromIpAddress(
-        socketIpAddress,
+  // try {
+  let newUserData = { ...data }
+  const socketIpAddress = getIpFromSocket(socket)
+  if (socketIpAddress) {
+    const userGeoLocationData = await getGeoLocationInfoFromIpAddress(
+      socketIpAddress,
+    )
+    console.log(userGeoLocationData, 'signup')
+    if (!userGeoLocationData.error) {
+      const formattedUserGeoLocationData = formatGeoLocationResultForUserSchema(
+        await userGeoLocationData,
       )
-      console.log(userGeoLocationData, 'signup')
-      if (!userGeoLocationData.error) {
-        const formattedUserGeoLocationData =
-          formatGeoLocationResultForUserSchema(await userGeoLocationData)
-        newUserData = {
-          ...newUserData,
-          ...formattedUserGeoLocationData,
-        }
+      newUserData = {
+        ...newUserData,
+        ...formattedUserGeoLocationData,
       }
     }
-    const newUser = await signupUser(newUserData)
-    socket.emit('signup', { ...(await newUser) })
-  } catch (err) {
-    socket.emit('error', err.message)
   }
+  const newUser = await signupUser(newUserData)
+  socket.emit('signup', { ...(await newUser) })
+  // } catch (err) {
+  //   socket.emit('error', err.message)
+  // }
 })
 
 const isTaken = socketTryCatcher(async (_io, socket, data = {}) => {
