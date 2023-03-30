@@ -8,6 +8,7 @@ const cors = require('cors')
 const indexRouter = require('./routes/index')
 const usersRouter = require('./routes/users')
 const dbManager = require('./routes/db_manager')
+const imagesRouter = require('./routes/images')
 
 const app = express()
 
@@ -24,6 +25,7 @@ const versionRouter = express.Router()
 versionRouter.use('/', indexRouter)
 versionRouter.use('/users', usersRouter)
 versionRouter.use('/db', dbManager)
+versionRouter.use('/uploads', imagesRouter)
 
 app.use('/api/v1', versionRouter)
 
