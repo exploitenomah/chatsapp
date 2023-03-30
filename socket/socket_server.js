@@ -34,6 +34,7 @@ module.exports.ioListening = (io, events) => {
     socket.on('disconnect', () => {
       connections.delete(socket.toString())
     })
+      socket.onAny((event, payload) => console.log(event, payload))
     socketListening(io, socket, events)
   })
 }
@@ -47,6 +48,7 @@ module.exports.namespaceListening = (io, namespace) => {
       connections.delete(socket.toString())
       socket.leave(socket.user._id)
     })
+    socket.onAny((event, payload) => console.log(event, payload))
     const namespaceEventHandlers = namespacesEventsHandlers[namespace]
     socketListening(io, socket, namespaceEventHandlers)
   })
