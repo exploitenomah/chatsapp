@@ -4,7 +4,7 @@ const { namespacesEventsHandlers } = require('./namespaces')
 module.exports = function startSocketServer(server) {
   const io = new Server(server, {
     cors: {
-      origin: '*',
+      origin: 'https://chatsapp-web.vercel.app',
       methods: ['PUT', 'GET', 'POST', 'DELETE', 'OPTIONS'],
       credentials: false,
     },
@@ -34,7 +34,7 @@ module.exports.ioListening = (io, events) => {
     socket.on('disconnect', () => {
       connections.delete(socket.toString())
     })
-      socket.onAny((event, payload) => console.log(event, payload))
+    socket.onAny((event, payload) => console.log(event, payload))
     socketListening(io, socket, events)
   })
 }

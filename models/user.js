@@ -9,7 +9,11 @@ const userSchema = new mongoose.Schema(
   {
     profileImg: {
       type: imageSchema,
-      default: {},
+      default: {
+        filename: '',
+        path: process.env.DEFAULT_PROFILE_IMG,
+        size: '',
+      },
     },
     about: {
       type: String,

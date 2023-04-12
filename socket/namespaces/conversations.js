@@ -4,6 +4,7 @@ const {
   updateConversation,
   getMany,
 } = require('../../controllers/conversation')
+const { getMany: getManyMessages } = require('../../controllers/message')
 const conversation = require('../../models/conversation')
 const { socketTryCatcher } = require('../../utils/tryCatcher')
 
@@ -12,6 +13,7 @@ const events = {
   update: 'update',
   getOne: 'getOne',
   getMany: 'getMany',
+  unSeenMsgsCount: 'unSeenMsgsCount',
 }
 
 module.exports.conversationEventHandlers = {
@@ -61,5 +63,18 @@ module.exports.conversationEventHandlers = {
         : { participants: { $in: socket.user._id } }),
     })
     socket.emit(events.getMany, conversations)
+  }),
+  [events.unSeenMsgsCount]: socketTryCatcher(async (_io, socket, data = {}) => {
+    const conversationId = data.conversationId
+    const unSeenMsgs = await getManyMessages({
+      sender: { ne: socket.user._id },
+      conversationId,
+      recipients: { $in: socket.user._id },
+      seen: false,
+    })
+    socket.emit(events.unSeenMsgsCount, {
+      unSeenMsgsCount: unSeenMsgs.length,
+      conversationId,
+    })
   }),
 }
