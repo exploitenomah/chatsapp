@@ -80,9 +80,4 @@ function onListening() {
   debug('Listening on ' + bind)
 }
 
-process.on('unhandledRejection', (err) => {
-  console.log('An Error Occurred!!!', err)
-  process.exit()
-})
-
 module.exports = server

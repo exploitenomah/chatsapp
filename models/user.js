@@ -1,5 +1,5 @@
 const mongoose = require('mongoose')
-const imageSchema = require('./image')
+const { imageSchema } = require('./image')
 const { emailRegex } = require('../utils/constants')
 const { bcryptEncrypt, bcryptCompare } = require('../utils/security')
 const { isIP } = require('net')
@@ -7,12 +7,16 @@ const { Friend } = require('./friend')
 
 const userSchema = new mongoose.Schema(
   {
-    profileImg: {
+    profileImage: {
       type: imageSchema,
       default: {
-        filename: '',
-        path: process.env.DEFAULT_PROFILE_IMG,
-        size: '',
+        fieldname: 'image',
+        originalname: 'default.jpeg',
+        encoding: '7bit',
+        mimetype: 'image/jpeg',
+        path: `https://res.cloudinary.com/${process.env.CLOUDINARY_CLOUD_NAME}/image/upload/v1681787884/chatsapp/thumb-images/ltfej2gzqlqwi22rhk9z.jpg`,
+        size: 983,
+        filename: 'chatsapp/thumb-images/ltfej2gzqlqwi22rhk9z',
       },
     },
     about: {
