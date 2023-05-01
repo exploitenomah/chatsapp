@@ -14,9 +14,9 @@ const userSchema = new mongoose.Schema(
         originalname: 'default.jpeg',
         encoding: '7bit',
         mimetype: 'image/jpeg',
-        path: `https://res.cloudinary.com/${process.env.CLOUDINARY_CLOUD_NAME}/image/upload/v1681787884/chatsapp/thumb-images/ltfej2gzqlqwi22rhk9z.jpg`,
+        path: `https://res.cloudinary.com/${process.env.CLOUDINARY_CLOUD_NAME}/image/upload/v1681787884/chatsapp/thumb-images/dwtuogkuksxbh4hfgd6n.jpg`,
         size: 983,
-        filename: 'chatsapp/thumb-images/ltfej2gzqlqwi22rhk9z',
+        filename: 'chatsapp/thumb-images/dwtuogkuksxbh4hfgd6n',
       },
     },
     about: {
