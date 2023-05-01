@@ -4,7 +4,7 @@ const { signJWT } = require('../utils/security')
 const { sterilizeObject } = require('../utils')
 const { universalQueryPaths } = require('../utils/constants')
 
-const allowedUpdatePaths = ['firstName', 'lastName', 'nickName', 'about']
+const allowedUpdatePaths = ['firstName', 'lastName', 'nickName', 'about', 'profileImage']
 
 const allowedQueryPaths = [...universalQueryPaths, ...allowedUpdatePaths]
 
