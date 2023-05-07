@@ -56,7 +56,7 @@ conversationSchema.pre(/^find/, function (next) {
   this.populate({
     path: 'participants',
     options: { _recursed: true },
-    select: 'nickName profileImg',
+    select: 'nickName profileImage',
   }).populate({ path: 'latestMessage', options: { _recursed: true } })
   next()
 })
@@ -65,7 +65,7 @@ conversationSchema.pre('save', async function (next) {
     {
       path: 'participants',
       options: { _recursed: true },
-      select: 'nickName profileImg',
+      select: 'nickName profileImage',
     },
     { path: 'latestMessage', options: { _recursed: true } },
   ])
