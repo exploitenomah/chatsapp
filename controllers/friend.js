@@ -34,7 +34,6 @@ module.exports.createFriend = async (data) => {
     const existingFriendship = await module.exports.getFriend({
       _id: existingFriendshipIdData._id.toString(),
     })
-    console.log(existingFriendship, 'fooxlosz')
     return await existingFriendship
   } else return await FriendController.createDoc({ ...data })
 }
@@ -60,7 +59,6 @@ module.exports.getMany = async (searchQuery) => {
   )
   return await friends
 }
-
 module.exports.getFriendsSuggestions = async ({ userId, page, limit }) => {
   const user = await getUser({ _id: userId })
   const aggregator = friendsSuggestionsAggregator(user, limit, page)
