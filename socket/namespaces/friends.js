@@ -86,8 +86,8 @@ module.exports.friendsEventHandlers = {
   [events.getSuggestions]: socketTryCatcher(async (_io, socket, data) => {
     const suggestions = await getFriendsSuggestions({
       userId: socket.user._id.toString(),
-      page: data.page,
-      limit: data.limit,
+      page: data.page | 1,
+      limit: data.limit | 100,
     })
     socket.emit(events.getSuggestions, suggestions)
   }),
