@@ -62,5 +62,5 @@ friendSchema.pre('findOne', function (next) {
   this.populate(module.exports.userPopulateOptions)
   next()
 })
-const Friend = new mongoose.model('Friend', friendSchema)
+const Friend = mongoose.model('Friend', friendSchema)
 module.exports.Friend = Friend
