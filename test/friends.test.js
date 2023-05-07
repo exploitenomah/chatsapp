@@ -46,7 +46,20 @@ describe('Friends', () => {
     friendClientTwo.close()
     resetDb()
   })
-
+  it('Should return an array of friend suggestion => events.getSuggestions.', function (done) {
+    friendClientOne.on('getSuggestions', function (data) {
+      expect(typeof data).to.equal(
+        'object',
+        `Expected an array got ${typeof data}`,
+      )
+      expect(Array.isArray(data)).to.equal(true)
+      done()
+    })
+    friendClientOne.on('error', function (friend) {
+      assert(false, friend)
+    })
+    friendClientOne.emit('getSuggestions', { page: 1, limit: 100 })
+  })
   it('Create a new friend request and emits to recipient => events.new.', function (done) {
     let newfriend = { recipient: userTwoInDb._id }
     friendClientOne.on('error', function (friend) {
@@ -78,7 +91,22 @@ describe('Friends', () => {
       requester: userOneInDb._id,
     })
   })
-
+  it('Gets many friends => events.getMany.', function (done) {
+    friendClientOne.on('getMany', function (data) {
+      expect(typeof data).to.equal(
+        'object',
+        `Expected an array got ${typeof data}`,
+      )
+      expect(Array.isArray(data)).to.equal(true)
+      done()
+    })
+    friendClientOne.on('error', function (friend) {
+      assert(false, friend)
+    })
+    friendClientOne.emit('getMany', {
+      requester: userOneInDb._id,
+    })
+  })
   it('Friend request should not be accepted by default', (done) => {
     expect(friendship.isValid).to.equal(false)
     done()
