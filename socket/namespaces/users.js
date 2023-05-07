@@ -70,7 +70,6 @@ const signup = socketTryCatcher(async (_io, socket, data = {}) => {
     const userGeoLocationData = await getGeoLocationInfoFromIpAddress(
       socketIpAddress,
     )
-    console.log(userGeoLocationData, 'signup')
     if (!userGeoLocationData.error) {
       const formattedUserGeoLocationData = formatGeoLocationResultForUserSchema(
         await userGeoLocationData,
