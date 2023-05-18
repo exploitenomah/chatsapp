@@ -42,6 +42,7 @@ module.exports.friendsSuggestionsAggregator = (user, limit, page) => {
         city: 1,
         countryName: 1,
         countryCode: 1,
+        profileImage: 1,
       },
     },
     {
@@ -55,6 +56,7 @@ module.exports.friendsSuggestionsAggregator = (user, limit, page) => {
         city: 1,
         countryName: 1,
         countryCode: 1,
+        profileImage: 1,
         friends: {
           $filter: {
             input: '$friends',
@@ -76,7 +78,6 @@ module.exports.friendsSuggestionsAggregator = (user, limit, page) => {
         },
       },
     },
-    // // { $match: {} },
     { $limit: limit },
     { $skip: (page - 1) * limit },
   ]
