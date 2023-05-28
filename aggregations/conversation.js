@@ -1,4 +1,8 @@
-module.exports.getConversationsPipeline = (user, limit = 100, page = 1) => {
+const {
+  Types: { ObjectId },
+} = require('mongoose')
+
+module.exports.getConversationsPipeline = ({ user, limit = 100, page = 1 }) => {
   return [
     {
       $match: {
