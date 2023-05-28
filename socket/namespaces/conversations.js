@@ -3,6 +3,7 @@ const {
   getConversation,
   updateConversation,
   getMany,
+  getUserConversations,
 } = require('../../controllers/conversation')
 const { getMany: getManyMessages } = require('../../controllers/message')
 const conversation = require('../../models/conversation')
@@ -56,11 +57,10 @@ module.exports.conversationEventHandlers = {
     socket.emit(events.update, updConversation)
   }),
   [events.getMany]: socketTryCatcher(async (_io, socket, data = {}) => {
-    const conversations = await getMany({
-      ...data,
-      ...(data.participants
-        ? { participants: [socket.user._id, ...(data.participants || [])] }
-        : { participants: { $in: socket.user._id } }),
+    const conversations = await getUserConversations({
+      userId: socket.user._id.toString(),
+      page: data.page | 1,
+      limit: data.limit | 100,
     })
     socket.emit(events.getMany, conversations)
   }),

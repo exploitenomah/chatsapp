@@ -42,7 +42,6 @@ module.exports.userEventHandlers = {
 }
 
 const login = socketTryCatcher(async (_io, socket, data = {}) => {
-  // try {
   const userData = await loginUser(data)
   if (userData) {
     const socketIpAddress = getIpFromSocket(socket)
@@ -57,13 +56,9 @@ const login = socketTryCatcher(async (_io, socket, data = {}) => {
       socket.emit('login', updatedUserData)
     }
   } else socket.emit('error', 'Invalid credentials')
-  // } catch (err) {
-  //   socket.emit('error', err.message)
-  // }
 })
 
 const signup = socketTryCatcher(async (_io, socket, data = {}) => {
-  // try {
   let newUserData = { ...data }
   const socketIpAddress = getIpFromSocket(socket)
   if (socketIpAddress) {
@@ -82,9 +77,6 @@ const signup = socketTryCatcher(async (_io, socket, data = {}) => {
   }
   const newUser = await signupUser(newUserData)
   socket.emit('signup', { ...(await newUser) })
-  // } catch (err) {
-  //   socket.emit('error', err.message)
-  // }
 })
 
 const isTaken = socketTryCatcher(async (_io, socket, data = {}) => {
