@@ -56,6 +56,9 @@ module.exports.getConversationsPipeline = ({ user, limit = 100, page = 1 }) => {
                       {
                         $eq: ['$$users.two', '$recipient'],
                       },
+                      {
+                        $eq: [true, '$isValid'],
+                      },
                     ],
                   },
                   {
@@ -65,6 +68,9 @@ module.exports.getConversationsPipeline = ({ user, limit = 100, page = 1 }) => {
                       },
                       {
                         $eq: ['$$users.one', '$recipient'],
+                      },
+                      {
+                        $eq: [true, '$isValid'],
                       },
                     ],
                   },
