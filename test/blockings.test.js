@@ -47,7 +47,7 @@ describe('Blockings', () => {
     resetDb()
   })
 
-  it('Create a new blocking and emits to blocker and blockee => events.new.', function (done) {
+  it('Create a new blocking and emits to blocker and blockee => events.block.', function (done) {
     let newblocking = { blockee: userTwoInDb._id }
     blockingClientOne.on('error', function (blocking) {
       assert(false, blocking)
@@ -73,7 +73,7 @@ describe('Blockings', () => {
       assert(false, blocking)
     })
     blockingClientOne.emit('getOne', {
-      _id: blocking._id,
+      otherUserId: userTwoInDb._id,
     })
   })
 
