@@ -1,7 +1,7 @@
 const {
   createBlocking,
-  getBlocking,
   deleteBlocking,
+  BlockingsController,
 } = require('../../controllers/blockings')
 const { socketTryCatcher } = require('../../utils/tryCatcher')
 
@@ -28,14 +28,29 @@ module.exports.blockingsEventHandlers = {
     }
   }),
   [events.getOne]: socketTryCatcher(async (_io, socket, data = {}) => {
-    const blocking = await getBlocking({ ...data })
+    const blocking = await BlockingsController.getDoc({
+      $or: [
+        {
+          blocker: socket.user._id,
+          blockee: data.otherUserId,
+        },
+        {
+          blocker: data.otherUserId,
+          blockee: socket.user._id,
+        },
+      ],
+    })
     socket.emit(events.getOne, blocking)
   }),
   [events.unblock]: socketTryCatcher(async (_io, socket, data) => {
     await deleteBlocking({
       _id: data.blockingId,
-      blocker: socket.user._id,
+      blockee: data.blockee,
+      blocker: socket.user._id.toString(),
     })
-    socket.emit(events.unblock, { unblocked: true })
+    socket.emit(events.unblock, {
+      unblocked: true,
+      blockingId: data.blockingId,
+    })
   }),
 }
