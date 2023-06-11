@@ -35,8 +35,5 @@
     "prettier": "^2.8.4",
     "prettier-plugin-solidity": "^1.1.2",
     "socket.io-client": "^4.6.1"
-  },
-  "engines": {
-    "node": ">=14.0.0 <19*"
   }
 }
