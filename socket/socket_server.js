@@ -4,7 +4,7 @@ const { namespacesEventsHandlers } = require('./namespaces')
 module.exports = function startSocketServer(server) {
   const io = new Server(server, {
     cors: {
-      origin: 'https://chatsapp-web.vercel.app',
+      origin: '*',
       methods: ['PUT', 'GET', 'POST', 'DELETE', 'OPTIONS'],
       credentials: false,
     },
