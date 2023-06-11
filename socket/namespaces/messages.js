@@ -1,11 +1,10 @@
 const {
   createMessage,
-  getMessage,
-  updateMessage,
   getMany,
   MessageController,
   updateMany,
 } = require('../../controllers/message')
+const { BlockingsController } = require('../../controllers/blockings')
 const { socketTryCatcher } = require('../../utils/tryCatcher')
 
 const { updateConversation } = require('../../controllers/conversation')
@@ -20,10 +19,34 @@ const events = {
 
 module.exports.messageEventHandlers = {
   [events.new]: socketTryCatcher(async (_io, socket, data = {}) => {
-    const newMsg = await createMessage({
-      ...data,
-      sender: socket.user._id,
+    const otherRecipient = data.recipients.find(
+      (user) => user.toString() !== socket.user._id.toString(),
+    )
+    const blocking = await BlockingsController.getDoc({
+      $or: [
+        {
+          blocker: otherRecipient,
+          blockee: socket.user._id,
+        },
+        {
+          blocker: socket.user._id,
+          blockee: otherRecipient,
+        },
+      ],
     })
+    let newMsg
+    if (blocking === null) {
+      newMsg = await createMessage({
+        ...data,
+        sender: socket.user._id,
+      })
+    } else {
+      newMsg = await createMessage({
+        ...data,
+        sender: socket.user._id,
+        recipients: [socket.user._id],
+      })
+    }
     await updateConversation(
       { _id: newMsg.conversationId },
       { latestMessage: newMsg._id },
