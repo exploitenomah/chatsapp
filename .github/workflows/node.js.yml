@@ -41,7 +41,6 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: "yarn"
       - run: yarn install --frozen-lockfile
-      - run: yarn build --if-present
       - name: "Start Backend"
         run: |
           yarn test:start &
