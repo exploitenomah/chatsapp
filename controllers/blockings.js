@@ -12,9 +12,9 @@ const allowedQueryPaths = [...universalQueryPaths, ...allowedUpdatePaths]
 const sterilizeBlockingsQuery = (query) => {
   return sterilizeObject(allowedQueryPaths, query)
 }
-
+module.exports.BlockingsController = BlockingsController
 module.exports.createBlocking = async (data) => {
-  const existingBlocking = await BlockingsController.checkIfExists({
+  const existingBlockingId = await BlockingsController.checkIfExists({
     $or: [
       {
         blocker: data.blocker,
@@ -26,6 +26,8 @@ module.exports.createBlocking = async (data) => {
       },
     ],
   })
+  const existingBlocking = await BlockingsController.getDoc(existingBlockingId)
+
   if (existingBlocking) return existingBlocking
   const blocking = await BlockingsController.createDoc({ ...data })
   return blocking
