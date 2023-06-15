@@ -6,7 +6,7 @@ const {
 } = require('../../controllers/message')
 const { BlockingsController } = require('../../controllers/blockings')
 const { socketTryCatcher } = require('../../utils/tryCatcher')
-
+const mongoose = require('mongoose')
 const { updateConversation } = require('../../controllers/conversation')
 const events = {
   new: 'new',
@@ -83,8 +83,20 @@ module.exports.messageEventHandlers = {
   }),
   [events.messagesSeen]: socketTryCatcher(async (_io, socket, data = {}) => {
     const { conversationId, participants } = data
+    const otherRecipient = participants.find(
+      (user) => user.toString() !== socket.user._id.toString(),
+    )
     const acknowledgement = await updateMany(
-      { conversationId, seen: false, sender: { $ne: socket.user._id } },
+      {
+        conversationId,
+        delivered: false,
+        recipients: {
+          $and: {
+            $in: [mongoose.Types.ObjectId(otherRecipient)],
+            $in: [mongoose.Types.ObjectId(socket.user._id)],
+          },
+        },
+      },
       { seen: true, delivered: true },
     )
     Array.isArray(participants) &&
@@ -97,8 +109,20 @@ module.exports.messageEventHandlers = {
   [events.messagesDelivered]: socketTryCatcher(
     async (_io, socket, data = {}) => {
       const { conversationId, participants } = data
+      const otherRecipient = participants.find(
+        (user) => user.toString() !== socket.user._id.toString(),
+      )
       const acknowledgement = await updateMany(
-        { conversationId, delivered: false, sender: { $ne: socket.user._id } },
+        {
+          conversationId,
+          delivered: false,
+          recipients: {
+            $and: {
+              $in: [mongoose.Types.ObjectId(otherRecipient)],
+              $in: [mongoose.Types.ObjectId(socket.user._id)],
+            },
+          },
+        },
         { delivered: true },
       )
       Array.isArray(participants) &&
