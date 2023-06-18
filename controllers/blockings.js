@@ -27,7 +27,7 @@ module.exports.createBlocking = async (data) => {
     ],
   })
   const existingBlocking = await BlockingsController.getDoc(existingBlockingId)
-
+  // fix this multiple blocking creation
   if (existingBlocking) return existingBlocking
   const blocking = await BlockingsController.createDoc({ ...data })
   return blocking
