@@ -2,7 +2,6 @@ const {
   createConversation,
   getConversation,
   updateConversation,
-  getMany,
   getUserConversations,
 } = require('../../controllers/conversation')
 const { getMany: getManyMessages } = require('../../controllers/message')
@@ -69,7 +68,8 @@ module.exports.conversationEventHandlers = {
     const unSeenMsgs = await getManyMessages({
       sender: { ne: socket.user._id },
       conversationId,
-      recipients: { $in: socket.user._id },
+      recipients: { $in: socket.user._id.toString() },
+      'recipients.1': { $exists: true },
       seen: false,
     })
     socket.emit(events.unSeenMsgsCount, {
