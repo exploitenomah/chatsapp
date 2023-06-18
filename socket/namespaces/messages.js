@@ -8,6 +8,7 @@ const { BlockingsController } = require('../../controllers/blockings')
 const { socketTryCatcher } = require('../../utils/tryCatcher')
 const mongoose = require('mongoose')
 const { updateConversation } = require('../../controllers/conversation')
+
 const events = {
   new: 'new',
   update: 'update',
@@ -17,55 +18,59 @@ const events = {
   messagesDelivered: 'messagesDelivered',
 }
 
-module.exports.messageEventHandlers = {
-  [events.new]: socketTryCatcher(async (_io, socket, data = {}) => {
-    const otherRecipient = data.recipients.find(
-      (user) => user.toString() !== socket.user._id.toString(),
+const newMessageHandler = socketTryCatcher(async (_io, socket, data = {}) => {
+  const otherRecipient = data.recipients.find(
+    (user) => user.toString() !== socket.user._id.toString(),
+  )
+  const blocking = await BlockingsController.checkIfExists({
+    $or: [
+      {
+        blocker: otherRecipient,
+        blockee: socket.user._id,
+      },
+      {
+        blocker: socket.user._id,
+        blockee: otherRecipient,
+      },
+    ],
+  })
+  let newMsgData = {
+    ...data,
+    sender: socket.user._id,
+  }
+  if (blocking !== null) newMsgData.recipients = [socket.user._id]
+
+  const newMsg = await createMessage(newMsgData)
+  await updateConversation(
+    { _id: newMsg.conversationId },
+    { latestMessage: newMsg._id },
+  )
+  await newMsg.recipients.forEach((recipient) => {
+    socket.to(recipient.toString()).emit(events.new, newMsg)
+  })
+})
+
+const messagesSeenOrDeliveredHandler = (update = {}) =>
+  socketTryCatcher(async (_io, socket, data = {}) => {
+    const { conversationId, participants } = data
+    const acknowledgement = await updateMany(
+      {
+        conversationId,
+        recipients: { $in: socket.user._id.toString() },
+        'recipients.1': { $exists: true },
+      },
+      update,
     )
-    const blocking = await BlockingsController.getDoc({
-      $or: [
-        {
-          blocker: otherRecipient,
-          blockee: socket.user._id,
-        },
-        {
-          blocker: socket.user._id,
-          blockee: otherRecipient,
-        },
-      ],
-    })
-    let newMsg
-    if (blocking === null) {
-      newMsg = await createMessage({
-        ...data,
-        sender: socket.user._id,
+    Array.isArray(participants) &&
+      participants.forEach((recipient) => {
+        socket
+          .to(recipient.toString())
+          .emit(events.messagesSeen, { ...acknowledgement, conversationId })
       })
-    } else {
-      newMsg = await createMessage({
-        ...data,
-        sender: socket.user._id,
-        recipients: [socket.user._id],
-      })
-    }
-    await updateConversation(
-      { _id: newMsg.conversationId },
-      { latestMessage: newMsg._id },
-    )
-    await newMsg.recipients.forEach((recipient) => {
-      socket.to(recipient.toString()).emit(events.new, newMsg)
-    })
-  }),
-  [events.getOne]: socketTryCatcher(async (_io, socket, data = {}) => {
-    const msg = await MessageController.getDoc({
-      ...data,
-      $or: [
-        { recipients: { $in: socket.user._id } },
-        { sender: socket.user._id },
-      ],
-    })
-    socket.emit(events.getOne, msg)
-  }),
-  [events.update]: socketTryCatcher(async (_io, socket, data = {}) => {
+  })
+
+const messageUpdateHandler = socketTryCatcher(
+  async (_io, socket, data = {}) => {
     const { query, update } = data
     const updMsg = await MessageController.updateDoc(
       {
@@ -80,68 +85,41 @@ module.exports.messageEventHandlers = {
     updMsg.recipients.forEach((recipient) => {
       socket.to(recipient.toString()).emit(events.update, updMsg)
     })
-  }),
-  [events.messagesSeen]: socketTryCatcher(async (_io, socket, data = {}) => {
-    const { conversationId, participants } = data
-    const otherRecipient = participants.find(
-      (user) => user.toString() !== socket.user._id.toString(),
+  },
+)
+
+module.exports.messageEventHandlers = {
+  [events.new]: newMessageHandler,
+  [events.getOne]: socketTryCatcher(async (_io, socket, data = {}) => {
+    socket.emit(
+      events.getOne,
+      await MessageController.getDoc({
+        ...data,
+        $or: [
+          { recipients: { $in: socket.user._id } },
+          { sender: socket.user._id },
+        ],
+      }),
     )
-    const acknowledgement = await updateMany(
-      {
-        conversationId,
-        delivered: false,
-        recipients: {
-          $and: {
-            $in: [mongoose.Types.ObjectId(otherRecipient)],
-            $in: [mongoose.Types.ObjectId(socket.user._id)],
-          },
-        },
-      },
-      { seen: true, delivered: true },
-    )
-    Array.isArray(participants) &&
-      participants.forEach((recipient) => {
-        socket
-          .to(recipient.toString())
-          .emit(events.messagesSeen, { ...acknowledgement, conversationId })
-      })
   }),
-  [events.messagesDelivered]: socketTryCatcher(
-    async (_io, socket, data = {}) => {
-      const { conversationId, participants } = data
-      const otherRecipient = participants.find(
-        (user) => user.toString() !== socket.user._id.toString(),
-      )
-      const acknowledgement = await updateMany(
-        {
-          conversationId,
-          delivered: false,
-          recipients: {
-            $and: {
-              $in: [mongoose.Types.ObjectId(otherRecipient)],
-              $in: [mongoose.Types.ObjectId(socket.user._id)],
-            },
-          },
-        },
-        { delivered: true },
-      )
-      Array.isArray(participants) &&
-        participants.forEach((recipient) => {
-          socket.to(recipient.toString()).emit(events.messagesDelivered, {
-            ...acknowledgement,
-            conversationId,
-          })
-        })
-    },
-  ),
+  [events.update]: messageUpdateHandler,
+  [events.messagesSeen]: messagesSeenOrDeliveredHandler({
+    seen: true,
+    delivered: true,
+  }),
+  [events.messagesDelivered]: messagesSeenOrDeliveredHandler({
+    delivered: true,
+  }),
   [events.getMany]: socketTryCatcher(async (_io, socket, data = {}) => {
-    const msgs = await getMany({
-      ...data,
-      or: [
-        { recipients: { $in: socket.user._id } },
-        { sender: socket.user._id },
-      ],
-    })
-    socket.emit(events.getMany, msgs)
+    socket.emit(
+      events.getMany,
+      await getMany({
+        ...data,
+        or: [
+          { recipients: { $in: socket.user._id } },
+          { sender: socket.user._id },
+        ],
+      }),
+    )
   }),
 }
