@@ -48,9 +48,11 @@ module.exports.blockingsEventHandlers = {
       blockee: data.blockee,
       blocker: socket.user._id.toString(),
     })
-    socket.emit(events.unblock, {
+    const unblockingData = {
       unblocked: true,
       blockingId: data.blockingId,
-    })
+    }
+    socket.to(data.blockee).emit(events.unblock, unblockingData)
+    socket.emit(events.unblock, unblockingData)
   }),
 }
