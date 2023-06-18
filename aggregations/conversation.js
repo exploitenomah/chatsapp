@@ -49,14 +49,26 @@ module.exports.getConversationsPipeline = ({ user, limit = 100, page = 1 }) => {
               $expr: {
                 $or: [
                   {
-                    $eq: ['$$users.one', '$requester'],
-                    $eq: ['$$users.two', '$recipient'],
-                    $eq: [true, '$isValid'],
+                    $and: [
+                      {
+                        $eq: ['$$users.one', '$requester'],
+                      },
+                      {
+                        $eq: ['$$users.two', '$recipient'],
+                      },
+                      { $eq: [true, '$isValid'] },
+                    ],
                   },
                   {
-                    $eq: ['$$users.two', '$requester'],
-                    $eq: ['$$users.one', '$recipient'],
-                    $eq: [true, '$isValid'],
+                    $and: [
+                      {
+                        $eq: ['$$users.two', '$requester'],
+                      },
+                      {
+                        $eq: ['$$users.one', '$recipient'],
+                      },
+                      { $eq: [true, '$isValid'] },
+                    ],
                   },
                 ],
               },
