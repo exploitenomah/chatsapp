@@ -50,7 +50,7 @@ const newMessageHandler = socketTryCatcher(async (_io, socket, data = {}) => {
   })
 })
 
-const messagesSeenOrDeliveredHandler = (update = {}) =>
+const messagesSeenOrDeliveredHandler = (update) =>
   socketTryCatcher(async (_io, socket, data = {}) => {
     const { conversationId, participants } = data
     const acknowledgement = await updateMany(
@@ -65,7 +65,10 @@ const messagesSeenOrDeliveredHandler = (update = {}) =>
       participants.forEach((recipient) => {
         socket
           .to(recipient.toString())
-          .emit(events.messagesSeen, { ...acknowledgement, conversationId })
+          .emit(update.seen ? events.messagesSeen : events.messagesDelivered, {
+            ...acknowledgement,
+            conversationId,
+          })
       })
   })
 
