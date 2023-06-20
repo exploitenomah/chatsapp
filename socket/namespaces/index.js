@@ -3,6 +3,7 @@ const { conversationEventHandlers } = require('./conversations')
 const { messageEventHandlers } = require('./messages')
 const { friendsEventHandlers } = require('./friends')
 const { blockingsEventHandlers } = require('./blockings')
+const { searchEventHandlers } = require('./search')
 
 const namespacesSrc = {
   users: '/users',
@@ -10,6 +11,7 @@ const namespacesSrc = {
   messages: '/messages',
   friends: '/friends',
   blockings: '/blockings',
+  search: '/search',
 }
 
 module.exports.namespacesEventsHandlers = {
@@ -18,5 +20,7 @@ module.exports.namespacesEventsHandlers = {
   [namespacesSrc.messages]: messageEventHandlers,
   [namespacesSrc.friends]: friendsEventHandlers,
   [namespacesSrc.blockings]: blockingsEventHandlers,
+  [namespacesSrc.search]: searchEventHandlers,
 }
+
 module.exports.namespaces = Object.values(namespacesSrc)
