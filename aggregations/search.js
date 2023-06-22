@@ -2,17 +2,29 @@ const {
   Types: { ObjectId },
 } = require('mongoose')
 
-module.exports.getMessagesSearchPipeline = ({ user, search, limit, page }) => {
+module.exports.getMessagesSearchPipeline = ({
+  user = {},
+  search = '',
+  conversationId,
+  limit = 100,
+  page = 1,
+}) => {
+  let firstMatchQuery = {
+    recipients: {
+      $in: [new ObjectId(user._id)],
+    },
+    text: {
+      $regex: search
+    },
+  }
+  if (conversationId?.length > 0)
+    firstMatchQuery = {
+      ...firstMatchQuery,
+      conversationId,
+    }
   return [
     {
-      $match: {
-        recipients: {
-          $in: [new ObjectId(user._id)],
-        },
-        text: {
-          $regex: search,
-        },
-      },
+      $match: firstMatchQuery,
     },
     {
       $limit: 100,

@@ -19,13 +19,31 @@ const searchUsers = async ({ userId, search, page, limit }) => {
   return results
 }
 
-const searchMessages = async ({ userId, search, page, limit }) => {
+const searchMessages = async ({
+  userId,
+  search,
+  conversationId,
+  page,
+  limit,
+}) => {
   const user = await getUser({ _id: userId })
-  const aggregator = getMessagesSearchPipeline({ user, search, limit, page })
-  const results = await Message.populate(await Message.aggregate(aggregator), {
-    path: 'conversationId',
-    select: 'latestMessage participants',
+  const aggregator = getMessagesSearchPipeline({
+    user,
+    search,
+    conversationId,
+    limit,
+    page,
   })
+  const results = await Message.populate(await Message.aggregate(aggregator), [
+    {
+      path: 'conversationId',
+      select: 'latestMessage participants',
+    },
+    {
+      path: 'sender',
+      select: 'firstName lastName nickName',
+    },
+  ])
   return results
 }
 

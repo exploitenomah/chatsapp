@@ -26,12 +26,13 @@ module.exports.searchEventHandlers = {
     socket.emit(events.searchUsers, results)
   }),
   [events.searchMessages]: socketTryCatcher(async (_io, socket, data) => {
-    const { search, page, limit } = data
+    const { search, page, limit, conversationId } = data
     const results = await searchMessages({
       userId: socket.user._id,
       search,
       page,
       limit,
+      conversationId
     })
     socket.emit(events.searchMessages, results)
   }),
