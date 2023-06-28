@@ -37,7 +37,6 @@ module.exports.getMessagesSearchPipeline = ({
   ]
 }
 module.exports.getUsersSearchPipeline = ({ search, user, limit, page }) => {
-  console.log(search)
   const query = { $regex: search || '' }
   return [
     {
