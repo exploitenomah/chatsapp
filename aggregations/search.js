@@ -2,17 +2,31 @@ const {
   Types: { ObjectId },
 } = require('mongoose')
 
-module.exports.getMessagesSearchPipeline = ({ user, search, limit, page }) => {
+module.exports.getMessagesSearchPipeline = ({
+  user = {},
+  search = '',
+  conversationId,
+  limit = 100,
+  page = 1,
+}) => {
+  let firstMatchQuery = {
+    recipients: {
+      $in: [new ObjectId(user._id)],
+    },
+    $or: [
+      { textLower: { $regex: search.toLowerCase().trim() } },
+      { text: { $regex: search.trim() } },
+    ],
+  }
+
+  if (conversationId?.length > 0)
+    firstMatchQuery = {
+      ...firstMatchQuery,
+      conversationId,
+    }
   return [
     {
-      $match: {
-        recipients: {
-          $in: [new ObjectId(user._id)],
-        },
-        text: {
-          $regex: search,
-        },
-      },
+      $match: firstMatchQuery,
     },
     {
       $limit: 100,
@@ -23,7 +37,6 @@ module.exports.getMessagesSearchPipeline = ({ user, search, limit, page }) => {
   ]
 }
 module.exports.getUsersSearchPipeline = ({ search, user, limit, page }) => {
-  console.log(search)
   const query = { $regex: search || '' }
   return [
     {

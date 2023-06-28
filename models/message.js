@@ -54,6 +54,11 @@ const messageModel = new mongoose.Schema(
       default: '',
       trim: true,
     },
+    textLower: {
+      type: String,
+      default: '',
+      trim: true,
+    },
     deletedAt: Date,
     seen: {
       type: Boolean,
@@ -79,10 +84,10 @@ const messageModel = new mongoose.Schema(
 //   this.populate({ path: 'sender', select: '-password -__v' })
 //   next()
 // })
-// messageModel.pre('save', async function (next) {
-//   this.populate({ path: 'sender', select: '-password -__v' })
-//   next()
-// })
+messageModel.pre('save', async function (next) {
+  this.textLower = this.text.toLowerCase()
+  next()
+})
 // messageModel.pre('save', async function (next) {
 //   if (!this.text || this.text.length === 0) {
 //     if (this.attachments.length === 0)
