@@ -13,10 +13,12 @@ module.exports.getMessagesSearchPipeline = ({
     recipients: {
       $in: [new ObjectId(user._id)],
     },
-    text: {
-      $regex: search
-    },
+    $or: [
+      { textLower: { $regex: search.toLowerCase().trim() } },
+      { text: { $regex: search.trim() } },
+    ],
   }
+
   if (conversationId?.length > 0)
     firstMatchQuery = {
       ...firstMatchQuery,
