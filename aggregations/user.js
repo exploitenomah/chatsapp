@@ -72,8 +72,50 @@ module.exports.friendsSuggestionsAggregator = (user, limit, page) => {
       },
     },
     {
+      $lookup: {
+        from: 'blockings',
+        as: 'blocking',
+        let: {
+          id: '$_id',
+        },
+        pipeline: [
+          {
+            $match: {
+              $expr: {
+                $or: [
+                  {
+                    $and: [
+                      {
+                        $eq: ['$$id', '$blocker'],
+                      },
+                      {
+                        $eq: [new ObjectId(user._id), '$blockee'],
+                      },
+                    ],
+                  },
+                  {
+                    $and: [
+                      {
+                        $eq: [new ObjectId(user._id), '$blocker'],
+                      },
+                      {
+                        $eq: ['$$id', '$blockee'],
+                      },
+                    ],
+                  },
+                ],
+              },
+            },
+          },
+        ],
+      },
+    },
+    {
       $match: {
         friends: {
+          $size: 0,
+        },
+        blocking: {
           $size: 0,
         },
       },

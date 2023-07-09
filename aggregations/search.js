@@ -22,7 +22,7 @@ module.exports.getMessagesSearchPipeline = ({
   if (conversationId?.length > 0)
     firstMatchQuery = {
       ...firstMatchQuery,
-      conversationId,
+      conversationId: new ObjectId(conversationId),
     }
   return [
     {
