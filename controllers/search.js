@@ -44,6 +44,7 @@ const searchMessages = async ({
       select: 'firstName lastName nickName',
     },
   ])
+
   return results
 }
 
