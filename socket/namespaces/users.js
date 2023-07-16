@@ -8,10 +8,10 @@ const {
   signupUser,
   updateUserGeoLocationInfo,
 } = require('../../controllers/user')
-const { getIpFromSocket } = require('../../utils/socket')
-const { formatGeoLocationResultForUserSchema } = require('../../utils/user')
+const { getIpFromSocket } = require('../.../utils/socket')
+const { formatGeoLocationResultForUserSchema } = require('../.../utils/user')
 const { getGeoLocationInfoFromIpAddress } = require('../../utils')
-const { socketTryCatcher } = require('../../utils/tryCatcher')
+const { socketTryCatcher } = require('../.../utils/tryCatcher')
 
 const events = {
   getOne: 'getOne',

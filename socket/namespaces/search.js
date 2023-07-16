@@ -3,7 +3,7 @@ const {
   searchMessages,
   search,
 } = require('../../controllers/search')
-const { socketTryCatcher } = require('../../utils/tryCatcher')
+const { socketTryCatcher } = require('../.../utils/tryCatcher')
 const events = {
   search: 'search',
   searchUsers: 'searchUsers',
@@ -32,7 +32,7 @@ module.exports.searchEventHandlers = {
       search,
       page,
       limit,
-      conversationId
+      conversationId,
     })
     socket.emit(events.searchMessages, results)
   }),
