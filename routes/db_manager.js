@@ -2,9 +2,13 @@ const mongoose = require('mongoose')
 const router = require('express').Router()
 
 router.get('/reset', async (req, res, next) => {
+  const dbName = mongoose.connection.name
+  const nodeEnv = process.env.NODE_ENV
   if (
-    process.env.NODE_ENV !== 'test' &&
-    mongoose.connection.name !== `${process.env.DB}-TEST`
+    nodeEnv !== 'test' &&
+    nodeEnv !== 'testLocal' &&
+    dbName !== `${process.env.DB}-TEST` &&
+    dbName !== `${process.env.DB}-TEST-LOCAL`
   )
     return next(new Error('Environment not allowed!!'))
   const db = mongoose.connection.db
