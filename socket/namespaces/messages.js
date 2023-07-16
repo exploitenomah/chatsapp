@@ -5,7 +5,7 @@ const {
   updateMany,
 } = require('../../controllers/message')
 const { BlockingsController } = require('../../controllers/blockings')
-const { socketTryCatcher } = require('../.../utils/tryCatcher')
+const { socketTryCatcher } = require('../../utils/tryCatcher')
 const mongoose = require('mongoose')
 const { updateConversation } = require('../../controllers/conversation')
 

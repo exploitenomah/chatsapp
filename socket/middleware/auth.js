@@ -1,5 +1,5 @@
 const { getUser } = require('../../controllers/user')
-const { verifyJWT } = require('../.../utils/security')
+const { verifyJWT } = require('../../utils/security')
 
 module.exports.authenticate = async (socket, next) => {
   try {

@@ -3,7 +3,7 @@ const {
   searchMessages,
   search,
 } = require('../../controllers/search')
-const { socketTryCatcher } = require('../.../utils/tryCatcher')
+const { socketTryCatcher } = require('../../utils/tryCatcher')
 const events = {
   search: 'search',
   searchUsers: 'searchUsers',

@@ -6,7 +6,7 @@ const {
 } = require('../../controllers/conversation')
 const { getMany: getManyMessages } = require('../../controllers/message')
 const conversation = require('../../models/conversation')
-const { socketTryCatcher } = require('../.../utils/tryCatcher')
+const { socketTryCatcher } = require('../../utils/tryCatcher')
 
 const events = {
   new: 'new',

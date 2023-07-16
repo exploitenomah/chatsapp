@@ -6,7 +6,7 @@ const {
   getFriendsSuggestions,
   deleteFriend,
 } = require('../../controllers/friend')
-const { socketTryCatcher } = require('../.../utils/tryCatcher')
+const { socketTryCatcher } = require('../../utils/tryCatcher')
 
 const events = {
   request: 'request',

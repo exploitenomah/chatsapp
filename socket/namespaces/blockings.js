@@ -3,7 +3,7 @@ const {
   deleteBlocking,
   BlockingsController,
 } = require('../../controllers/blockings')
-const { socketTryCatcher } = require('../.../utils/tryCatcher')
+const { socketTryCatcher } = require('../../utils/tryCatcher')
 
 const events = {
   block: 'block',
