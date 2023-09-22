@@ -1,7 +1,7 @@
 const io = require('socket.io-client')
 const path = require('path')
 const { expect, assert } = require('chai')
-const resetDb = require('./utils/reset_db')
+const resetDb = require('../utils/reset_db')
 
 require('dotenv').config({
   path: path.resolve(__dirname, '.env'),

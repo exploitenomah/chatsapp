@@ -1,7 +1,7 @@
 const path = require('path')
 const { expect, assert } = require('chai')
-const resetDb = require('./utils/reset_db')
-const { getClient, createUsers } = require('./utils/init')
+const resetDb = require('../utils/reset_db')
+const { getClient, createUsers } = require('../utils/init')
 
 require('dotenv').config({
   path: path.resolve('.env'),

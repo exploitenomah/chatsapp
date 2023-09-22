@@ -53,6 +53,7 @@ const userSchema = new mongoose.Schema(
         )
       },
       trim: true,
+      lowercase: true
     },
     email: {
       type: String,

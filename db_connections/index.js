@@ -2,12 +2,14 @@ const devConn = require('./dev')
 const prodConn = require('./prod')
 const testConn = require('./test')
 const localConn = require('./local')
+const testLocalConn = require('./testLocal')
 
 const connections = {
   test: testConn,
   dev: devConn,
   prod: prodConn,
   local: localConn,
+  testLocal: testLocalConn,
 }
 
 module.exports = function (onConnectCb) {

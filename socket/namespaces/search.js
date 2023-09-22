@@ -32,7 +32,7 @@ module.exports.searchEventHandlers = {
       search,
       page,
       limit,
-      conversationId
+      conversationId,
     })
     socket.emit(events.searchMessages, results)
   }),

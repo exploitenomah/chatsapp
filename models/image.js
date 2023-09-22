@@ -8,7 +8,9 @@ module.exports.imageSchema = new mongoose.Schema({
   },
   path: {
     type: String,
-    default: `https://res.cloudinary.com/${process.env.CLOUDINARY_CLOUD_NAME}/image/upload/v1681787884/chatsapp/thumb-images/ltfej2gzqlqwi22rhk9z.jpg`,
+    default:
+      'https://img.freepik.com/premium-vector/man-avatar-profile-picture-vector-illustration_268834-538.jpg?w=1480',
+    // `https://res.cloudinary.com/${process.env.CLOUDINARY_CLOUD_NAME}/image/upload/v1681787884/chatsapp/thumb-images/ltfej2gzqlqwi22rhk9z.jpg`,
     required: [true, 'path must be specified'],
   },
   size: {

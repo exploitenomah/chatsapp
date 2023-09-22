@@ -10,7 +10,10 @@ class DocumentController {
     newDoc = await newDoc.save()
     return newDoc
   }
-
+  async createManyDocs(data) {
+    let docs = await this.Model.create(data)
+    return docs
+  }
   async getDoc(query, select = '') {
     return await this.Model.findOne(query, ' -__v ' + select)
   }
