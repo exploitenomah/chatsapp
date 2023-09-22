@@ -7,7 +7,7 @@
     "dev": "NODE_ENV=dev yarn node server.js",
     "local": "NODE_ENV=local yarn nodemon server.js",
     "test:start": "NODE_ENV=test yarn node server.js",
-    "test-local:start": "NODE_ENV=testLocal yarn node server.js",
+    "test-local:start": "NODE_ENV=testLocal yarn nodemon server.js",
     "test": "echo $NODE_ENV && yarn mocha --recursive -r dotenv/config  --timeout 10000 && echo $NODE_ENV "
   },
   "dependencies": {
