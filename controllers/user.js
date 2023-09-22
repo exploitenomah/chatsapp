@@ -75,7 +75,9 @@ module.exports.deleteUser = async (filter) => {
 module.exports.getMany = async (searchQuery) => {
   return await UserController.getMany(searchQuery)
 }
-
+module.exports.createManyDocs = async (data = []) => {
+  return await UserController.createManyDocs(data)
+}
 module.exports.updateUserGeoLocationInfo = async (userId, ipAddress) => {
   const userGeoLocationData = await getGeoLocationInfoFromIpAddress(ipAddress)
   const formattedUserGeoLocationData =
